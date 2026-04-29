@@ -1,6 +1,6 @@
 // FDU 7480 Vehicle Expense Tracker Logic
 
-const APP_VERSION = "1.1.0";
+const APP_VERSION = "1.2.1";
 
 // Global functions for HTML access
 window.printIndividualReceipt = function() {
@@ -11,49 +11,57 @@ window.downloadReceiptPDF = function() {
     const element = document.getElementById('receiptContent');
     if (!element) return;
 
-    // Show a loading indicator
     const btn = document.querySelector('[onclick="downloadReceiptPDF()"]');
     const originalText = btn.innerHTML;
-    btn.innerHTML = "Processing... (لوڈ ہو رہا ہے)";
+    btn.innerHTML = "Processing... (تیار ہو رہا ہے)";
     btn.disabled = true;
 
-    // Check if html2pdf is available
     if (!window.html2pdf) {
-        alert("PDF Library is still loading. Please wait 5 seconds. | پی ڈی ایف لائبریری ابھی لوڈ ہو رہی ہے، براہ کرم 5 سیکنڈ انتظار کریں۔");
+        alert("Library loading... Try in 5s.");
         btn.innerHTML = originalText;
         btn.disabled = false;
         return;
     }
 
-    // Small delay to ensure any rendering in modal is settled
     setTimeout(() => {
         const opt = {
-            margin: [10, 5, 10, 5],
+            margin: [10, 10],
             filename: `FDU7480_Trip_${Date.now()}.pdf`,
-            image: { type: 'jpeg', quality: 0.95 },
-            html2canvas: { 
-                scale: 1.5, 
-                useCORS: true,
-                backgroundColor: '#ffffff',
-                letterRendering: true,
-                scrollY: 0,
-                scrollX: 0,
-                windowWidth: 800 // Force a specific width for rendering
-            },
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
         };
         
-        window.html2pdf().from(element).set(opt).save().then(() => {
+        window.html2pdf().from(element).set(opt).toPdf().get('pdf').then(function (pdf) {
+            // For mobile, we try to use the share API if available
+            if (navigator.share && navigator.canShare) {
+                const pdfBlob = pdf.output('blob');
+                const file = new File([pdfBlob], `Trip_Receipt_${Date.now()}.pdf`, { type: 'application/pdf' });
+                
+                if (navigator.canShare({ files: [file] })) {
+                    navigator.share({
+                        files: [file],
+                        title: 'Trip Receipt',
+                        text: 'FDU 7480 Receipt'
+                    }).catch(err => {
+                        console.log('Share failed, saving normally');
+                        pdf.save();
+                    });
+                } else {
+                    pdf.save();
+                }
+            } else {
+                pdf.save();
+            }
             btn.innerHTML = originalText;
             btn.disabled = false;
         }).catch(err => {
             console.error('PDF Error:', err);
             btn.innerHTML = originalText;
             btn.disabled = false;
-            alert("Generating standard PDF... (پرنٹ ویو کھل رہا ہے)");
             window.print();
         });
-    }, 600); 
+    }, 500); 
 };
 
 window.closeModal = function() {
@@ -84,29 +92,17 @@ function formatDate(dateStr) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Check for updates
     async function checkForUpdates() {
         try {
-            console.log('Checking for updates... Current version:', APP_VERSION);
-            const response = await fetch('/version.json?nocache=' + Date.now());
+            const response = await fetch('/version.json?v=' + Date.now(), { cache: 'no-store' });
             if (response.ok) {
                 const data = await response.json();
-                console.log('Server version:', data.version);
-                const lastSeenVersion = localStorage.getItem('fdu7480_app_version');
-                
-                if (data.version !== APP_VERSION && data.version !== lastSeenVersion) {
+                if (data.version !== APP_VERSION) {
                     const updateToast = document.getElementById('updateToast');
                     const updateMessage = document.getElementById('updateMessage');
                     if (updateToast && updateMessage) {
                         updateMessage.textContent = data.message;
                         updateToast.style.display = 'block';
-                        
-                        updateToast.onclick = (e) => {
-                            if (e.target.tagName !== 'BUTTON') {
-                                updateToast.style.display = 'none';
-                                localStorage.setItem('fdu7480_app_version', data.version);
-                            }
-                        };
                     }
                 }
             }

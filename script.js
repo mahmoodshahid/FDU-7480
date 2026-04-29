@@ -1,6 +1,6 @@
 // FDU 7480 Vehicle Expense Tracker Logic
 
-const APP_VERSION = "1.0.1";
+const APP_VERSION = "1.0.2";
 
 // Global functions for HTML access
 window.printIndividualReceipt = function() {
@@ -11,33 +11,48 @@ window.downloadReceiptPDF = function() {
     const element = document.getElementById('receiptContent');
     if (!element) return;
 
+    // Show a loading indicator
+    const btn = document.querySelector('[onclick="downloadReceiptPDF()"]');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = "Generating... (تیار ہو رہا ہے)";
+    btn.disabled = true;
+
     // Small delay to ensure any rendering in modal is settled
     setTimeout(() => {
         const opt = {
-            margin: [10, 10],
-            filename: `FDU7480_Trip_${Date.now()}.pdf`,
-            image: { type: 'jpeg', quality: 0.98 },
+            margin: [5, 5],
+            filename: `FDU7480_Receipt_${Date.now()}.pdf`,
+            image: { type: 'jpeg', quality: 0.95 },
             html2canvas: { 
-                scale: 2, 
+                scale: 1, // Use scale 1 for maximum mobile compatibility
                 useCORS: true,
                 backgroundColor: '#ffffff',
                 scrollY: 0,
-                scrollX: 0
+                scrollX: 0,
+                logging: false,
+                width: element.offsetWidth,
+                windowWidth: element.offsetWidth
             },
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
         };
         
         if (window.html2pdf) {
-            // Generate PDF
-            window.html2pdf().from(element).set(opt).save().catch(err => {
+            window.html2pdf().from(element).set(opt).save().then(() => {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }).catch(err => {
                 console.error('PDF Error:', err);
-                alert("PDF Download Failed. Using Print as fallback. | پی ڈی ایف ڈاؤن لوڈ ناکام رہی۔ پرنٹ استعمال کریں۔");
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                alert("PDF Download failed on this device. Opening Print view... | پی ڈی ایف ڈاؤن لوڈ کام نہیں کر رہا، پرنٹ ویو کھل رہا ہے۔");
                 window.print();
             });
         } else {
-            alert("Library loading. Please try in 3 seconds.");
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+            alert("Library not ready. Try again in a moment.");
         }
-    }, 200);
+    }, 800); 
 };
 
 window.closeModal = function() {

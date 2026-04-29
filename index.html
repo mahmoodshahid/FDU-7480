@@ -188,7 +188,21 @@
         </section>
     </main>
 
-    <script src="script.js"></script>
+    <!-- Receipt Modal -->
+    <div id="receiptModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <div id="receiptContent">
+                <!-- Data will be injected here -->
+            </div>
+            <div style="text-align: center; margin-top: 20px; font-size: 13px; color: #64748b;" class="no-print">
+                <p>To Save: Select "Save as PDF" in the printer options.<br>سیو کرنے کے لیے پرنٹر میں Save as PDF منتخب کریں۔</p>
+                <button class="btn btn-primary" style="width: auto; padding: 10px 30px; margin-top: 10px;" onclick="printIndividualReceipt()">Print / Save as PDF</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="script.js"></script>
 </body>
 </html>
 

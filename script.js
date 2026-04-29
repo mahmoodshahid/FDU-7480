@@ -1,5 +1,27 @@
 // FDU 7480 Vehicle Expense Tracker Logic
 
+// Global functions for HTML access
+window.printIndividualReceipt = function() {
+    window.print();
+};
+
+window.closeModal = function() {
+    document.getElementById('receiptModal').style.display = 'none';
+    document.body.classList.remove('modal-open');
+};
+
+window.printReport = function() {
+    window.print();
+};
+
+// Close modal when clicking outside
+window.onclick = function(event) {
+    const modal = document.getElementById('receiptModal');
+    if (event.target == modal) {
+        window.closeModal();
+    }
+};
+
 document.addEventListener('DOMContentLoaded', () => {
     // Select elements
     const tripForm = document.getElementById('tripForm');
@@ -23,6 +45,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const today = new Date();
     document.getElementById('dateGoing').valueAsDate = today;
     document.getElementById('dateReturn').valueAsDate = today;
+
+    // Helper function for date formatting (DD-MM-YYYY)
+    function formatDate(dateStr) {
+        if (!dateStr) return '';
+        const parts = dateStr.split('-');
+        if (parts.length !== 3) return dateStr;
+        return `${parts[2]}-${parts[1]}-${parts[0]}`;
+    }
 
     // Auto-calculate Fare
     function calculateFare() {
@@ -128,7 +158,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const balanceDisplay = `<span class="${statusClass}">${Math.abs(record.balance).toLocaleString()} ${statusText}</span>`;
 
             const tripDisplay = `Going: ${record.rawangiGoing} → ${record.stopGoing}${record.stopReturn ? ' | Return: ' + record.rawangiReturn + ' → ' + record.stopReturn : ''}`;
-            const dateDisplay = `${record.dateGoing}${record.dateReturn && record.dateReturn !== record.dateGoing ? ' / ' + record.dateReturn : ''}`;
+            const formattedDateGoing = formatDate(record.dateGoing);
+            const formattedDateReturn = formatDate(record.dateReturn);
+            const dateDisplay = `${formattedDateGoing}${record.dateReturn && record.dateReturn !== record.dateGoing ? ' / ' + formattedDateReturn : ''}`;
 
             row.innerHTML = `
                 <td>${dateDisplay}</td>
@@ -169,92 +201,48 @@ document.addEventListener('DOMContentLoaded', () => {
         const record = records.find(r => r.id === id);
         if (!record) return;
 
-        // Create a temporary printable receipt
-        const receiptWindow = window.open('', '_blank');
         const balanceLabel = record.balance >= 0 ? "Bachat (بچت)" : "Nuqsan (نقصان)";
         const balanceColor = record.balance >= 0 ? "#059669" : "#dc2626";
 
-        receiptWindow.document.write(`
-            <html>
-            <head>
-                <title>Trip Receipt - ${record.dateGoing}</title>
-                <style>
-                    body { font-family: 'Segoe UI', sans-serif; padding: 40px; color: #334155; line-height: 1.6; }
-                    .header { text-align: center; border-bottom: 2px solid #1e40af; padding-bottom: 20px; margin-bottom: 30px; }
-                    .header h1 { margin: 0; color: #1e40af; font-size: 28px; }
-                    .header p { margin: 5px 0; opacity: 0.8; }
-                    .details-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px; }
-                    .section { margin-bottom: 25px; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; }
-                    .section h3 { margin-top: 0; border-bottom: 1px solid #f1f5f9; padding-bottom: 8px; color: #1e40af; font-size: 16px; }
-                    .row { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 14px; }
-                    .row span:first-child { font-weight: 600; color: #64748b; }
-                    .total-row { border-top: 2px solid #e2e8f0; padding-top: 10px; margin-top: 10px; font-weight: 700; font-size: 18px; }
-                    .balance-box { background: ${balanceColor}10; border: 2px solid ${balanceColor}; color: ${balanceColor}; padding: 15px; border-radius: 8px; text-align: center; margin-top: 30px; font-size: 22px; font-weight: 800; }
-                    .urdu { direction: rtl; text-align: right; font-family: inherit; }
-                    @media print { .btn-print { display: none; } }
-                </style>
-            </head>
-            <body>
-                <div class="header">
-                    <h1>FDU 7480 - Trip Report</h1>
-                    <p>Vehicle Expense Tracker | وہیکل ایکسپنس ٹریکر</p>
+        const receiptHtml = `
+            <div style="font-family: 'Segoe UI', sans-serif; color: #334155; line-height: 1.4;">
+                <div style="text-align: center; border-bottom: 2px solid #1e40af; padding-bottom: 15px; margin-bottom: 20px;">
+                    <h1 style="margin: 0; color: #1e40af; font-size: 24px;">FDU 7480</h1>
+                    <p style="margin: 5px 0; opacity: 0.8; font-size: 14px;">Trip Receipt | سفر کی رسید</p>
                 </div>
 
-                <div class="details-grid">
-                    <div class="section">
-                        <h3>Trip Details | سفر کی تفصیلات</h3>
-                        <div class="row"><span>Date Going:</span><span>${record.dateGoing}</span></div>
-                        <div class="row"><span>From:</span><span>${record.rawangiGoing}</span></div>
-                        <div class="row"><span>To:</span><span>${record.stopGoing}</span></div>
+                <div style="display: grid; grid-template-columns: 1fr; gap: 15px; margin-bottom: 20px;">
+                    <div style="border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; background: #f8fafc;">
+                        <h3 style="margin-top: 0; color: #1e40af; font-size: 14px; border-bottom: 1px solid #e2e8f0; padding-bottom: 5px;">Trip Details</h3>
+                        <div style="display:flex; justify-content:space-between; font-size: 13px; margin: 4px 0;"><span>Going:</span><span>${formatDate(record.dateGoing)}</span></div>
+                        <div style="display:flex; justify-content:space-between; font-size: 13px; margin: 4px 0;"><span>Route:</span><span>${record.rawangiGoing} → ${record.stopGoing}</span></div>
                         ${record.stopReturn ? `
-                            <br>
-                            <div class="row"><span>Date Wapsi:</span><span>${record.dateReturn}</span></div>
-                            <div class="row"><span>From:</span><span>${record.rawangiReturn}</span></div>
-                            <div class="row"><span>To:</span><span>${record.stopReturn}</span></div>
+                            <div style="display:flex; justify-content:space-between; font-size: 13px; margin: 4px 0; border-top: 1px dashed #cbd5e1; padding-top: 4px; margin-top: 4px;"><span>Return:</span><span>${formatDate(record.dateReturn)}</span></div>
+                            <div style="display:flex; justify-content:space-between; font-size: 13px; margin: 4px 0;"><span>Route:</span><span>${record.rawangiReturn} → ${record.stopReturn}</span></div>
                         ` : ''}
                     </div>
-                    <div class="section">
-                        <h3>Fare (Kiraya) | کرایہ</h3>
-                        <div class="row"><span>Kiraya 1:</span><span>Rs. ${record.kiraya1.toLocaleString()}</span></div>
-                        <div class="row"><span>Kiraya 2:</span><span>Rs. ${record.kiraya2.toLocaleString()}</span></div>
-                        <div class="row total-row"><span>Total:</span><span>Rs. ${record.totalKiraya.toLocaleString()}</span></div>
-                    </div>
                 </div>
 
-                <div class="section">
-                    <h3>Expenses | اخراجات</h3>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
-                        <div>
-                            <div class="row"><span>Diesel:</span><span>Rs. ${record.diesel.toLocaleString()}</span></div>
-                            <div class="row"><span>Toll:</span><span>Rs. ${record.toll.toLocaleString()}</span></div>
-                            <div class="row"><span>Jurmana:</span><span>Rs. ${record.jurmana.toLocaleString()}</span></div>
-                        </div>
-                        <div>
-                            <div class="row"><span>Khana:</span><span>Rs. ${record.khana.toLocaleString()}</span></div>
-                            <div class="row"><span>Driver:</span><span>Rs. ${record.driver.toLocaleString()}</span></div>
-                            <div class="row"><span>Digar:</span><span>Rs. ${record.digar.toLocaleString()}</span></div>
-                        </div>
-                    </div>
-                    <div class="row total-row" style="color: #9a3412;"><span>Total Expenses:</span><span>Rs. ${record.totalExpenses.toLocaleString()}</span></div>
+                <div style="border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; margin-bottom: 15px;">
+                    <h3 style="margin-top: 0; color: #1e40af; font-size: 14px; border-bottom: 1px solid #e2e8f0; padding-bottom: 5px;">Summary | خلاصہ</h3>
+                    <div style="display:flex; justify-content:space-between; font-size: 13px; margin: 4px 0;"><span>Total Fare:</span><span style="font-weight:700;">Rs. ${record.totalKiraya.toLocaleString()}</span></div>
+                    <div style="display:flex; justify-content:space-between; font-size: 13px; margin: 4px 0; color: #dc2626;"><span>Total Expenses:</span><span>Rs. ${record.totalExpenses.toLocaleString()}</span></div>
                 </div>
 
-                <div class="balance-box">
+                <div style="background: ${balanceColor}10; border: 2px solid ${balanceColor}; color: ${balanceColor}; padding: 15px; border-radius: 8px; text-align: center; font-size: 20px; font-weight: 800;">
                     ${balanceLabel}: Rs. ${Math.abs(record.balance).toLocaleString()}
                 </div>
-
-                <div style="text-align:center; margin-top:40px;">
-                    <button class="btn-print" onclick="window.print()" style="padding: 10px 30px; background: #1e40af; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">Save as PDF / Print</button>
+                
+                <div style="margin-top: 20px; font-size: 10px; text-align: center; color: #94a3b8;">
+                    Generated on ${new Date().toLocaleString()}
                 </div>
-            </body>
-            </html>
-        `);
-        receiptWindow.document.close();
-    }
+            </div>
+        `;
 
-    // Print functionality for all records
-    window.printReport = function() {
-        window.print();
-    };
+        document.getElementById('receiptContent').innerHTML = receiptHtml;
+        document.getElementById('receiptModal').style.display = 'block';
+        document.body.classList.add('modal-open');
+    }
 
     // Initial render
     renderRecords();

@@ -17,39 +17,71 @@
 
     <main class="main-content">
         <form id="tripForm">
-            <!-- Trip Section -->
-            <div class="card">
-                <h2>
-                    <span>Trip Details</span>
-                    <span class="urdu-text">ٹارگٹ اور تاریخ</span>
-                </h2>
-                <div class="form-group">
-                    <div class="label-container">
-                        <label for="tripDate">Select Date (تاریخ)</label>
+            <div class="trip-grid-container">
+                <div class="card">
+                    <h2>
+                        <span>Pehla Chakkar</span>
+                        <span class="urdu-text">پہلا چکر</span>
+                    </h2>
+                    <div class="form-group">
+                        <div class="label-container">
+                            <label for="dateGoing">Date Going (تاریخ جانا)</label>
+                        </div>
+                        <input type="date" id="dateGoing" required>
                     </div>
-                    <input type="date" id="tripDate" required>
+                    <div class="form-group">
+                        <div class="label-container">
+                            <label for="rawangiGoing">Rawangi (روانگی)</label>
+                        </div>
+                        <select id="rawangiGoing" required>
+                            <option value="نیو کشمیر">نیو کشمیر</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <div class="label-container">
+                            <label for="stopGoing">Stop (سٹاپ)</label>
+                        </div>
+                        <select id="stopGoing" required>
+                            <option value="">Select Stop</option>
+                            <option value="لاہور">لاہور</option>
+                            <option value="شیخوپورہ">شیخوپورہ</option>
+                            <option value="شرقپور">شرقپور</option>
+                        </select>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <div class="label-container">
-                        <label for="trip1to2">Trip 1 to 2 (سفر 1 سے 2)</label>
+
+                <div class="card">
+                    <h2>
+                        <span>Wapsi</span>
+                        <span class="urdu-text">واپسی</span>
+                    </h2>
+                    <div class="form-group">
+                        <div class="label-container">
+                            <label for="dateReturn">Date Return (تاریخ واپسی)</label>
+                        </div>
+                        <input type="date" id="dateReturn">
                     </div>
-                    <select id="trip1to2" required>
-                        <option value="">Select Route (راستہ منتخب کریں)</option>
-                        <option value="نیو کشمیر سے لاہور">نیو کشمیر سے لاہور</option>
-                        <option value="نیو کشمیر سے شیخوپورہ">نیو کشمیر سے شیخوپورہ</option>
-                        <option value="نیو کشمیر سے شرقپور">نیو کشمیر سے شرقپور</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <div class="label-container">
-                        <label for="trip2to1">Trip 2 to 1 (سفر 2 سے 1)</label>
+                    <div class="form-group">
+                        <div class="label-container">
+                            <label for="rawangiReturn">Rawangi (روانگی)</label>
+                        </div>
+                        <select id="rawangiReturn">
+                            <option value="">Select Rawangi</option>
+                            <option value="بھائی پھیرو">بھائی پھیرو</option>
+                            <option value="شیخوپورہ">شیخوپورہ</option>
+                        </select>
                     </div>
-                    <select id="trip2to1" required>
-                        <option value="">Select Route (راستہ منتخب کریں)</option>
-                        <option value="لاہور سے نیو کشمیر">لاہور سے نیو کشمیر</option>
-                        <option value="شیخوپورہ سے نیو کشمیر">شیخوپورہ سے نیو کشمیر</option>
-                        <option value="شرقپور سے نیو کشمیر">شرقپور سے نیو کشمیر</option>
-                    </select>
+                    <div class="form-group">
+                        <div class="label-container">
+                            <label for="stopReturn">Stop (سٹاپ)</label>
+                        </div>
+                        <select id="stopReturn">
+                            <option value="">Select Stop</option>
+                            <option value="سالم">سالم</option>
+                            <option value="منڈی">منڈی</option>
+                            <option value="بھیرہ">بھیرہ</option>
+                        </select>
+                    </div>
                 </div>
             </div>
 

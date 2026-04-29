@@ -19,8 +19,10 @@ document.addEventListener('DOMContentLoaded', () => {
     ].map(id => document.getElementById(id));
     const totalExpensesDisplay = document.getElementById('totalExpensesDisplay');
 
-    // Initialize date with today
-    document.getElementById('tripDate').valueAsDate = new Date();
+    // Initialize dates with today
+    const today = new Date();
+    document.getElementById('dateGoing').valueAsDate = today;
+    document.getElementById('dateReturn').valueAsDate = today;
 
     // Auto-calculate Fare
     function calculateFare() {
@@ -69,9 +71,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const record = {
             id: Date.now(),
-            date: document.getElementById('tripDate').value,
-            trip12: document.getElementById('trip1to2').value,
-            trip21: document.getElementById('trip2to1').value,
+            dateGoing: document.getElementById('dateGoing').value,
+            rawangiGoing: document.getElementById('rawangiGoing').value,
+            stopGoing: document.getElementById('stopGoing').value,
+            dateReturn: document.getElementById('dateReturn').value,
+            rawangiReturn: document.getElementById('rawangiReturn').value,
+            stopReturn: document.getElementById('stopReturn').value,
             kiraya1: parseFloat(kiraya1Input.value) || 0,
             kiraya2: parseFloat(kiraya2Input.value) || 0,
             totalKiraya: calculateFare(),
@@ -88,7 +93,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         saveRecordToLocal(record);
         tripForm.reset();
-        document.getElementById('tripDate').valueAsDate = new Date();
+        document.getElementById('dateGoing').valueAsDate = new Date();
+        document.getElementById('dateReturn').valueAsDate = new Date();
         updateProfitLoss();
         renderRecords();
     });
@@ -118,9 +124,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const statusText = record.balance >= 0 ? 'Bachat' : 'Nuqsan';
             const balanceDisplay = `<span class="${statusClass}">${Math.abs(record.balance).toLocaleString()} ${statusText}</span>`;
 
+            const tripDisplay = `Going: ${record.rawangiGoing} → ${record.stopGoing}${record.stopReturn ? ' | Return: ' + record.rawangiReturn + ' → ' + record.stopReturn : ''}`;
+            const dateDisplay = `${record.dateGoing}${record.dateReturn && record.dateReturn !== record.dateGoing ? ' / ' + record.dateReturn : ''}`;
+
             row.innerHTML = `
-                <td>${record.date}</td>
-                <td>${record.trip12} / ${record.trip21}</td>
+                <td>${dateDisplay}</td>
+                <td>${tripDisplay}</td>
                 <td>${record.totalKiraya.toLocaleString()}</td>
                 <td>${record.totalExpenses.toLocaleString()}</td>
                 <td>${balanceDisplay}</td>

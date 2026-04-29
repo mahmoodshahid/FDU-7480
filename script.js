@@ -1,6 +1,6 @@
 // FDU 7480 Vehicle Expense Tracker Logic
 
-const APP_VERSION = "1.7.1";
+const APP_VERSION = "1.8.0";
 
 // Global functions for HTML access
 window.shareSummaryAsImage = function() {
@@ -74,32 +74,57 @@ window.shareSummaryAsImage = function() {
 
     const btn = document.querySelector('[onclick="shareSummaryAsImage()"]');
     const originalText = btn.innerHTML;
-    btn.innerHTML = "...";
+    btn.innerHTML = "Creating Image...";
     btn.disabled = true;
 
-    const h2c = window.html2canvas || (window.html2pdf && window.html2pdf.it && window.html2pdf.it.html2canvas);
+    const h2c = window.html2canvas;
     if (h2c) {
-        h2c(container, { scale: 3, useCORS: true, backgroundColor: '#ffffff' }).then(canvas => {
+        h2c(container, { 
+            scale: 2, 
+            useCORS: true, 
+            backgroundColor: '#ffffff',
+            logging: false,
+            allowTaint: true
+        }).then(canvas => {
             canvas.toBlob(blob => {
                 const file = new File([blob], `Summary_${Date.now()}.png`, { type: 'image/png' });
                 if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-                    navigator.share({ files: [file], title: 'Trip Summary' })
+                    navigator.share({ 
+                        files: [file], 
+                        title: 'FDU 7480 Summary',
+                        text: 'Overall Trip Summary'
+                    })
+                    .then(() => {
+                        btn.innerHTML = originalText;
+                        btn.disabled = false;
+                    })
                     .catch(() => {
                         const link = document.createElement('a');
                         link.href = canvas.toDataURL('image/png');
                         link.download = `Summary_${Date.now()}.png`;
                         link.click();
+                        btn.innerHTML = originalText;
+                        btn.disabled = false;
                     });
                 } else {
                     const link = document.createElement('a');
                     link.href = canvas.toDataURL('image/png');
                     link.download = `Summary_${Date.now()}.png`;
                     link.click();
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
                 }
-                btn.innerHTML = originalText;
-                btn.disabled = false;
             }, 'image/png');
+        }).catch(err => {
+            console.error('Image Error:', err);
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+            alert("Error creating image. Please try again.");
         });
+    } else {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+        alert("Image library not loaded. Please refresh.");
     }
 };
 
@@ -520,9 +545,15 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
 
         // Capture as Image
-        const h2c = window.html2canvas || (window.html2pdf && window.html2pdf.it && window.html2pdf.it.html2canvas);
+        const h2c = window.html2canvas;
         if (h2c) {
-            h2c(container, { scale: 3, useCORS: true, backgroundColor: '#ffffff' }).then(canvas => {
+            h2c(container, { 
+                scale: 2, 
+                useCORS: true, 
+                backgroundColor: '#ffffff',
+                logging: false,
+                allowTaint: true
+            }).then(canvas => {
                 canvas.toBlob(blob => {
                     const file = new File([blob], `Trip_Report_${record.dateGoing}.png`, { type: 'image/png' });
                     if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
@@ -543,7 +574,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         link.click();
                     }
                 }, 'image/png');
+            }).catch(err => {
+                console.error('Record Image Error:', err);
+                alert("Error sharing PNG");
             });
+        } else {
+            alert("Sharing library not ready");
         }
     }
 

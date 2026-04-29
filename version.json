@@ -1,5 +1,5 @@
 {
-  "version": "1.7.1",
-  "message": "Update 1.7.1: PNG reports switched to Left-to-Right (LTR) alignment for better readability. | پی این جی رپورٹس اب بائیں سے دائیں (LTR) الائن منٹ میں دستیاب ہیں۔",
+  "version": "1.8.0",
+  "message": "Update 1.8.0: Fixed PNG sharing issues on mobile devices for both summary and individual reports. | موبائل آلات پر پی این جی شیئرنگ کے مسائل حل کر دیے گئے ہیں۔",
   "forced": true
 }

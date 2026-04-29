@@ -1,6 +1,6 @@
 // FDU 7480 Vehicle Expense Tracker Logic
 
-const APP_VERSION = "1.0.4";
+const APP_VERSION = "1.1.0";
 
 // Global functions for HTML access
 window.printIndividualReceipt = function() {
@@ -28,15 +28,17 @@ window.downloadReceiptPDF = function() {
     // Small delay to ensure any rendering in modal is settled
     setTimeout(() => {
         const opt = {
-            margin: [10, 10, 10, 10],
-            filename: `Receipt_FDU7480_${Date.now()}.pdf`,
-            image: { type: 'jpeg', quality: 0.98 },
+            margin: [10, 5, 10, 5],
+            filename: `FDU7480_Trip_${Date.now()}.pdf`,
+            image: { type: 'jpeg', quality: 0.95 },
             html2canvas: { 
-                scale: 2, 
+                scale: 1.5, 
                 useCORS: true,
                 backgroundColor: '#ffffff',
                 letterRendering: true,
-                scrollY: -window.scrollY
+                scrollY: 0,
+                scrollX: 0,
+                windowWidth: 800 // Force a specific width for rendering
             },
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
         };
@@ -48,10 +50,10 @@ window.downloadReceiptPDF = function() {
             console.error('PDF Error:', err);
             btn.innerHTML = originalText;
             btn.disabled = false;
-            alert("Mobile PDF Failed. Opening standard print view... | موبائل پی ڈی ایف ناکام رہا، پرنٹ ویو کھولا جا رہا ہے۔");
+            alert("Generating standard PDF... (پرنٹ ویو کھل رہا ہے)");
             window.print();
         });
-    }, 500); 
+    }, 600); 
 };
 
 window.closeModal = function() {

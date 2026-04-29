@@ -1,6 +1,6 @@
 // FDU 7480 Vehicle Expense Tracker Logic
 
-const APP_VERSION = "1.2.1";
+const APP_VERSION = "1.3.0";
 
 // Global functions for HTML access
 window.printIndividualReceipt = function() {

@@ -1,8 +1,43 @@
 // FDU 7480 Vehicle Expense Tracker Logic
 
+const APP_VERSION = "1.0.1";
+
 // Global functions for HTML access
 window.printIndividualReceipt = function() {
     window.print();
+};
+
+window.downloadReceiptPDF = function() {
+    const element = document.getElementById('receiptContent');
+    if (!element) return;
+
+    // Small delay to ensure any rendering in modal is settled
+    setTimeout(() => {
+        const opt = {
+            margin: [10, 10],
+            filename: `FDU7480_Trip_${Date.now()}.pdf`,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { 
+                scale: 2, 
+                useCORS: true,
+                backgroundColor: '#ffffff',
+                scrollY: 0,
+                scrollX: 0
+            },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+        
+        if (window.html2pdf) {
+            // Generate PDF
+            window.html2pdf().from(element).set(opt).save().catch(err => {
+                console.error('PDF Error:', err);
+                alert("PDF Download Failed. Using Print as fallback. | پی ڈی ایف ڈاؤن لوڈ ناکام رہی۔ پرنٹ استعمال کریں۔");
+                window.print();
+            });
+        } else {
+            alert("Library loading. Please try in 3 seconds.");
+        }
+    }, 200);
 };
 
 window.closeModal = function() {
@@ -11,6 +46,8 @@ window.closeModal = function() {
 };
 
 window.printReport = function() {
+    // For full report, we can use window.print() as it handles the whole page better
+    // or generate a massive PDF.
     window.print();
 };
 
@@ -22,7 +59,46 @@ window.onclick = function(event) {
     }
 };
 
+// Helper function for date formatting (DD-MM-YYYY)
+function formatDate(dateStr) {
+    if (!dateStr) return '';
+    const parts = dateStr.split('-');
+    if (parts.length !== 3) return dateStr;
+    return `${parts[2]}-${parts[1]}-${parts[0]}`;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+    // Check for updates
+    async function checkForUpdates() {
+        try {
+            const response = await fetch('/version.json?t=' + Date.now());
+            if (response.ok) {
+                const data = await response.json();
+                const lastSeenVersion = localStorage.getItem('fdu7480_app_version');
+                
+                if (data.version !== APP_VERSION && data.version !== lastSeenVersion) {
+                    const updateToast = document.getElementById('updateToast');
+                    const updateMessage = document.getElementById('updateMessage');
+                    updateMessage.textContent = data.message;
+                    updateToast.style.display = 'block';
+                    
+                    // Add close functionality
+                    updateToast.onclick = (e) => {
+                        if (e.target.tagName !== 'BUTTON') {
+                            updateToast.style.display = 'none';
+                            localStorage.setItem('fdu7480_app_version', data.version);
+                        }
+                    };
+                }
+            }
+        } catch (error) {
+            console.log('Update check failed:', error);
+        }
+    }
+
+    // Call update check
+    checkForUpdates();
+
     // Select elements
     const tripForm = document.getElementById('tripForm');
     const recordsTableBody = document.querySelector('#recordsTable tbody');
@@ -45,14 +121,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const today = new Date();
     document.getElementById('dateGoing').valueAsDate = today;
     document.getElementById('dateReturn').valueAsDate = today;
-
-    // Helper function for date formatting (DD-MM-YYYY)
-    function formatDate(dateStr) {
-        if (!dateStr) return '';
-        const parts = dateStr.split('-');
-        if (parts.length !== 3) return dateStr;
-        return `${parts[2]}-${parts[1]}-${parts[0]}`;
-    }
 
     // Auto-calculate Fare
     function calculateFare() {
@@ -205,36 +273,75 @@ document.addEventListener('DOMContentLoaded', () => {
         const balanceColor = record.balance >= 0 ? "#059669" : "#dc2626";
 
         const receiptHtml = `
-            <div style="font-family: 'Segoe UI', sans-serif; color: #334155; line-height: 1.4;">
+            <div style="font-family: Arial, sans-serif; color: #000000; line-height: 1.5; background: #ffffff; padding: 20px; width: 100%;">
                 <div style="text-align: center; border-bottom: 2px solid #1e40af; padding-bottom: 15px; margin-bottom: 20px;">
-                    <h1 style="margin: 0; color: #1e40af; font-size: 24px;">FDU 7480</h1>
-                    <p style="margin: 5px 0; opacity: 0.8; font-size: 14px;">Trip Receipt | سفر کی رسید</p>
+                    <h1 style="margin: 0; color: #1e40af; font-size: 28px;">FDU 7480</h1>
+                    <p style="margin: 5px 0; color: #64748b; font-size: 16px; font-weight: 600;">Trip Receipt | سفر کی رسید</p>
                 </div>
 
-                <div style="display: grid; grid-template-columns: 1fr; gap: 15px; margin-bottom: 20px;">
-                    <div style="border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; background: #f8fafc;">
-                        <h3 style="margin-top: 0; color: #1e40af; font-size: 14px; border-bottom: 1px solid #e2e8f0; padding-bottom: 5px;">Trip Details</h3>
-                        <div style="display:flex; justify-content:space-between; font-size: 13px; margin: 4px 0;"><span>Going:</span><span>${formatDate(record.dateGoing)}</span></div>
-                        <div style="display:flex; justify-content:space-between; font-size: 13px; margin: 4px 0;"><span>Route:</span><span>${record.rawangiGoing} → ${record.stopGoing}</span></div>
+                <div style="margin-bottom: 25px; border: 1px solid #e2e8f0; border-radius: 10px; padding: 15px; background: #f8fafc;">
+                    <h3 style="margin-top: 0; color: #1e40af; font-size: 16px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 12px;">Trip Details</h3>
+                    <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                        <tr>
+                            <td style="padding: 5px 0; font-weight: 600;">Date (Going):</td>
+                            <td style="padding: 5px 0; text-align: right; font-family: monospace;">${formatDate(record.dateGoing)}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 5px 0; font-weight: 600;">Route:</td>
+                            <td style="padding: 5px 0; text-align: right;">${record.rawangiGoing} → ${record.stopGoing}</td>
+                        </tr>
                         ${record.stopReturn ? `
-                            <div style="display:flex; justify-content:space-between; font-size: 13px; margin: 4px 0; border-top: 1px dashed #cbd5e1; padding-top: 4px; margin-top: 4px;"><span>Return:</span><span>${formatDate(record.dateReturn)}</span></div>
-                            <div style="display:flex; justify-content:space-between; font-size: 13px; margin: 4px 0;"><span>Route:</span><span>${record.rawangiReturn} → ${record.stopReturn}</span></div>
+                        <tr>
+                             <td colspan="2" style="padding: 10px 0; border-top: 1px dashed #cbd5e1;"></td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 5px 0; font-weight: 600;">Date (Return):</td>
+                            <td style="padding: 5px 0; text-align: right; font-family: monospace;">${formatDate(record.dateReturn)}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 5px 0; font-weight: 600;">Route:</td>
+                            <td style="padding: 5px 0; text-align: right;">${record.rawangiReturn} → ${record.stopReturn}</td>
+                        </tr>
                         ` : ''}
-                    </div>
+                    </table>
                 </div>
 
-                <div style="border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; margin-bottom: 15px;">
-                    <h3 style="margin-top: 0; color: #1e40af; font-size: 14px; border-bottom: 1px solid #e2e8f0; padding-bottom: 5px;">Summary | خلاصہ</h3>
-                    <div style="display:flex; justify-content:space-between; font-size: 13px; margin: 4px 0;"><span>Total Fare:</span><span style="font-weight:700;">Rs. ${record.totalKiraya.toLocaleString()}</span></div>
-                    <div style="display:flex; justify-content:space-between; font-size: 13px; margin: 4px 0; color: #dc2626;"><span>Total Expenses:</span><span>Rs. ${record.totalExpenses.toLocaleString()}</span></div>
+                <div style="border: 1px solid #e2e8f0; border-radius: 10px; padding: 15px; margin-bottom: 20px;">
+                    <h3 style="margin-top: 0; color: #1e40af; font-size: 16px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 12px;">Financial Summary</h3>
+                    <table style="width: 100%; border-collapse: collapse; font-size: 15px;">
+                        <tr>
+                            <td style="padding: 8px 0;">Total Fare (کرایہ):</td>
+                            <td style="padding: 8px 0; text-align: right; font-weight: 800; color: #1e40af;">Rs. ${record.totalKiraya.toLocaleString()}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px 0;">Total Expenses (اخراجات):</td>
+                            <td style="padding: 8px 0; text-align: right; font-weight: 700; color: #dc2626;">- Rs. ${record.totalExpenses.toLocaleString()}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" style="padding: 15px 0; border-top: 3px double #e2e8f0;">
+                                <table style="width: 100%;">
+                                    <tr>
+                                        <td style="font-size: 18px; font-weight: 800; color: ${balanceColor};">${balanceLabel}:</td>
+                                        <td style="font-size: 24px; font-weight: 900; color: ${balanceColor}; text-align: right;">Rs. ${Math.abs(record.balance).toLocaleString()}</td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
                 </div>
 
-                <div style="background: ${balanceColor}10; border: 2px solid ${balanceColor}; color: ${balanceColor}; padding: 15px; border-radius: 8px; text-align: center; font-size: 20px; font-weight: 800;">
-                    ${balanceLabel}: Rs. ${Math.abs(record.balance).toLocaleString()}
-                </div>
-                
-                <div style="margin-top: 20px; font-size: 10px; text-align: center; color: #94a3b8;">
-                    Generated on ${new Date().toLocaleString()}
+                <div style="margin-top: 30px; border-top: 1px solid #f1f5f9; padding-top: 10px;">
+                    <table style="width: 100%; font-size: 11px; color: #94a3b8;">
+                        <tr>
+                            <td>
+                                Trip ID: #${record.id}<br>
+                                Generated: ${new Date().toLocaleString()}
+                            </td>
+                            <td style="text-align: right; font-family: 'Courier New', Courier, monospace; color: #1e40af; font-weight: bold;">
+                                FDU 7480
+                            </td>
+                        </tr>
+                    </table>
                 </div>
             </div>
         `;

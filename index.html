@@ -5,6 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FDU 7480 - Vehicle Expense Tracker</title>
     <link rel="stylesheet" href="style.css">
+    <!-- PDF Generation Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script>
+        // Check if library failed to load
+        window.addEventListener('load', () => {
+            if (!window.html2pdf) {
+                console.error("PDF Library failed to load from CDN. Retrying with alternative...");
+                let script = document.createElement('script');
+                script.src = "https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js";
+                document.head.appendChild(script);
+            }
+        });
+    </script>
 </head>
 <body>
     <header>
@@ -12,14 +25,21 @@
             <h1>FDU 7480</h1>
             <p>Vehicle Expense Tracker | وہیکل ایکسپنس ٹریکر</p>
         </div>
-        <div id="grandTotalContainer" style="background: rgba(255,255,255,0.1); padding: 8px 16px; border-radius: 8px; text-align: center; border: 1px solid rgba(255,255,255,0.2);">
-            <div style="font-size: 11px; opacity: 0.8; font-weight: 600;">TOTAL BACHAT (ٹوٹل بچت)</div>
-            <div id="grandTotalAmount" style="font-size: 20px; font-weight: 800; color: #10b981;">Rs. 0</div>
+        <div id="grandTotalContainer" style="background: rgba(255,255,255,0.15); padding: 10px 20px; border-radius: 10px; text-align: center; border: 1px solid rgba(255,255,255,0.3); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
+            <div style="font-size: 13px; opacity: 1; font-weight: 700; color: #fbbf24;">TOTAL BACHAT (ٹوٹل بچت)</div>
+            <div id="grandTotalAmount" style="font-size: 24px; font-weight: 900; color: #10b981;">Rs. 0</div>
         </div>
-        <button type="button" class="btn btn-print" style="width: auto; margin: 0; padding: 10px 20px; background: #3b82f6;" onclick="printReport()">Download PDF / Print</button>
+        <button type="button" class="btn btn-print" style="width: auto; margin: 0; padding: 10px 20px; background: #3b82f6;" onclick="printReport()">Download Summary PDF</button>
     </header>
 
     <main class="main-content">
+        <!-- Update Notification (Hidden by default) -->
+        <div id="updateToast" class="update-toast" style="display: none;">
+            <div class="update-content">
+                <span id="updateMessage">New update available! | نئی اپ ڈیٹ دستیاب ہے!</span>
+                <button onclick="window.location.reload()" class="btn-update">Update Now</button>
+            </div>
+        </div>
         <form id="tripForm">
             <div class="trip-grid-container">
                 <div class="card">
@@ -197,8 +217,8 @@
                 <!-- Data will be injected here -->
             </div>
             <div style="text-align: center; margin-top: 20px; font-size: 13px; color: #64748b;" class="no-print">
-                <p>To Save: Select "Save as PDF" in the printer options.<br>سیو کرنے کے لیے پرنٹر میں Save as PDF منتخب کریں۔</p>
-                <button class="btn btn-primary" style="width: auto; padding: 10px 30px; margin-top: 10px;" onclick="printIndividualReceipt()">Print / Save as PDF</button>
+                <p>Click below to download as PDF file.<br>پی ڈی ایف فائل ڈاؤن لوڈ کرنے کے لیے نیچے کلک کریں۔</p>
+                <button class="btn btn-primary" style="width: auto; padding: 10px 30px; margin-top: 10px; background: #059669;" onclick="downloadReceiptPDF()">Download PDF (ڈاؤن لوڈ)</button>
             </div>
         </div>
     </div>

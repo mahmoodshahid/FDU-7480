@@ -359,6 +359,44 @@ td {
     color: #334155;
 }
 
+/* Update Toast */
+.update-toast {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1e40af;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 50px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    z-index: 2000;
+    animation: slideInDown 0.5s ease-out;
+}
+
+.update-content {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    white-space: nowrap;
+}
+
+.btn-update {
+    background: #fbbf24;
+    color: #1e40af;
+    border: none;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+@keyframes slideInDown {
+    from { transform: translate(-50%, -100px); opacity: 0; }
+    to { transform: translate(-50%, 0); opacity: 1; }
+}
+
 @media print {
     body.modal-open > *:not(#receiptModal) {
         display: none !important;

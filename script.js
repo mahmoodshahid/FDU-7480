@@ -1,6 +1,6 @@
 // FDU 7480 Vehicle Expense Tracker Logic
 
-const APP_VERSION = "1.3.0";
+const APP_VERSION = "1.3.1";
 
 // Global functions for HTML access
 window.printIndividualReceipt = function() {
@@ -261,22 +261,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Update Grand Total in Header
         const grandTotalElement = document.getElementById('grandTotalAmount');
-        grandTotalElement.textContent = `Rs. ${grandTotal.toLocaleString()}`;
-        grandTotalElement.style.color = grandTotal >= 0 ? '#10b981' : '#ef4444';
-
-        // Add action event listeners
-        document.querySelectorAll('.btn-delete').forEach(btn => {
-            btn.addEventListener('click', () => {
-                deleteRecord(Number(btn.getAttribute('data-id')));
-            });
-        });
-
-        document.querySelectorAll('.btn-share').forEach(btn => {
-            btn.addEventListener('click', () => {
-                shareRecord(Number(btn.getAttribute('data-id')));
-            });
-        });
+        if (grandTotalElement) {
+            grandTotalElement.textContent = `Rs. ${grandTotal.toLocaleString()}`;
+            grandTotalElement.style.color = grandTotal >= 0 ? '#10b981' : '#ef4444';
+        }
     }
+
+    // Event Delegation for Table Actions
+    recordsTableBody.addEventListener('click', (e) => {
+        const target = e.target;
+        if (target.classList.contains('btn-delete')) {
+            const id = Number(target.getAttribute('data-id'));
+            deleteRecord(id);
+        } else if (target.classList.contains('btn-share')) {
+            const id = Number(target.getAttribute('data-id'));
+            shareRecord(id);
+        }
+    });
 
     // Share/Print Individual Record
     function shareRecord(id) {

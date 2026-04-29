@@ -136,8 +136,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td>${record.totalKiraya.toLocaleString()}</td>
                 <td>${record.totalExpenses.toLocaleString()}</td>
                 <td>${balanceDisplay}</td>
-                <td>
-                    <button class="btn btn-delete" data-id="${record.id}">Delete</button>
+                <td class="action-btns-cell">
+                    <button class="btn-action btn-share" data-id="${record.id}">PDF / Share</button>
+                    <button class="btn-action btn-delete" data-id="${record.id}">Delete</button>
                 </td>
             `;
             recordsTableBody.appendChild(row);
@@ -148,15 +149,109 @@ document.addEventListener('DOMContentLoaded', () => {
         grandTotalElement.textContent = `Rs. ${grandTotal.toLocaleString()}`;
         grandTotalElement.style.color = grandTotal >= 0 ? '#10b981' : '#ef4444';
 
-        // Add delete event listeners
+        // Add action event listeners
         document.querySelectorAll('.btn-delete').forEach(btn => {
             btn.addEventListener('click', () => {
                 deleteRecord(Number(btn.getAttribute('data-id')));
             });
         });
+
+        document.querySelectorAll('.btn-share').forEach(btn => {
+            btn.addEventListener('click', () => {
+                shareRecord(Number(btn.getAttribute('data-id')));
+            });
+        });
     }
 
-    // Print functionality
+    // Share/Print Individual Record
+    function shareRecord(id) {
+        const records = JSON.parse(localStorage.getItem('fdu7480_records') || '[]');
+        const record = records.find(r => r.id === id);
+        if (!record) return;
+
+        // Create a temporary printable receipt
+        const receiptWindow = window.open('', '_blank');
+        const balanceLabel = record.balance >= 0 ? "Bachat (بچت)" : "Nuqsan (نقصان)";
+        const balanceColor = record.balance >= 0 ? "#059669" : "#dc2626";
+
+        receiptWindow.document.write(`
+            <html>
+            <head>
+                <title>Trip Receipt - ${record.dateGoing}</title>
+                <style>
+                    body { font-family: 'Segoe UI', sans-serif; padding: 40px; color: #334155; line-height: 1.6; }
+                    .header { text-align: center; border-bottom: 2px solid #1e40af; padding-bottom: 20px; margin-bottom: 30px; }
+                    .header h1 { margin: 0; color: #1e40af; font-size: 28px; }
+                    .header p { margin: 5px 0; opacity: 0.8; }
+                    .details-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px; }
+                    .section { margin-bottom: 25px; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; }
+                    .section h3 { margin-top: 0; border-bottom: 1px solid #f1f5f9; padding-bottom: 8px; color: #1e40af; font-size: 16px; }
+                    .row { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 14px; }
+                    .row span:first-child { font-weight: 600; color: #64748b; }
+                    .total-row { border-top: 2px solid #e2e8f0; padding-top: 10px; margin-top: 10px; font-weight: 700; font-size: 18px; }
+                    .balance-box { background: ${balanceColor}10; border: 2px solid ${balanceColor}; color: ${balanceColor}; padding: 15px; border-radius: 8px; text-align: center; margin-top: 30px; font-size: 22px; font-weight: 800; }
+                    .urdu { direction: rtl; text-align: right; font-family: inherit; }
+                    @media print { .btn-print { display: none; } }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <h1>FDU 7480 - Trip Report</h1>
+                    <p>Vehicle Expense Tracker | وہیکل ایکسپنس ٹریکر</p>
+                </div>
+
+                <div class="details-grid">
+                    <div class="section">
+                        <h3>Trip Details | سفر کی تفصیلات</h3>
+                        <div class="row"><span>Date Going:</span><span>${record.dateGoing}</span></div>
+                        <div class="row"><span>From:</span><span>${record.rawangiGoing}</span></div>
+                        <div class="row"><span>To:</span><span>${record.stopGoing}</span></div>
+                        ${record.stopReturn ? `
+                            <br>
+                            <div class="row"><span>Date Wapsi:</span><span>${record.dateReturn}</span></div>
+                            <div class="row"><span>From:</span><span>${record.rawangiReturn}</span></div>
+                            <div class="row"><span>To:</span><span>${record.stopReturn}</span></div>
+                        ` : ''}
+                    </div>
+                    <div class="section">
+                        <h3>Fare (Kiraya) | کرایہ</h3>
+                        <div class="row"><span>Kiraya 1:</span><span>Rs. ${record.kiraya1.toLocaleString()}</span></div>
+                        <div class="row"><span>Kiraya 2:</span><span>Rs. ${record.kiraya2.toLocaleString()}</span></div>
+                        <div class="row total-row"><span>Total:</span><span>Rs. ${record.totalKiraya.toLocaleString()}</span></div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h3>Expenses | اخراجات</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
+                        <div>
+                            <div class="row"><span>Diesel:</span><span>Rs. ${record.diesel.toLocaleString()}</span></div>
+                            <div class="row"><span>Toll:</span><span>Rs. ${record.toll.toLocaleString()}</span></div>
+                            <div class="row"><span>Jurmana:</span><span>Rs. ${record.jurmana.toLocaleString()}</span></div>
+                        </div>
+                        <div>
+                            <div class="row"><span>Khana:</span><span>Rs. ${record.khana.toLocaleString()}</span></div>
+                            <div class="row"><span>Driver:</span><span>Rs. ${record.driver.toLocaleString()}</span></div>
+                            <div class="row"><span>Digar:</span><span>Rs. ${record.digar.toLocaleString()}</span></div>
+                        </div>
+                    </div>
+                    <div class="row total-row" style="color: #9a3412;"><span>Total Expenses:</span><span>Rs. ${record.totalExpenses.toLocaleString()}</span></div>
+                </div>
+
+                <div class="balance-box">
+                    ${balanceLabel}: Rs. ${Math.abs(record.balance).toLocaleString()}
+                </div>
+
+                <div style="text-align:center; margin-top:40px;">
+                    <button class="btn-print" onclick="window.print()" style="padding: 10px 30px; background: #1e40af; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">Save as PDF / Print</button>
+                </div>
+            </body>
+            </html>
+        `);
+        receiptWindow.document.close();
+    }
+
+    // Print functionality for all records
     window.printReport = function() {
         window.print();
     };

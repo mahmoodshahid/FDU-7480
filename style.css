@@ -234,13 +234,33 @@ header p {
     margin-top: 8px;
 }
 
-.btn-delete {
-    background: #ef4444;
-    color: white;
-    padding: 4px 8px;
-    font-size: 10px;
+.action-btns-cell {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+}
+
+.btn-action {
+    border: none;
     border-radius: 4px;
-    width: auto;
+    padding: 6px 10px;
+    font-size: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    color: white;
+    transition: opacity 0.2s;
+}
+
+.btn-share {
+    background-color: var(--secondary-blue);
+}
+
+.btn-delete {
+    background-color: var(--danger);
+}
+
+.btn-action:hover {
+    opacity: 0.8;
 }
 
 .table-container {

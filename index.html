@@ -51,7 +51,7 @@
         </div>
         <div class="menu-body">
             <!-- Overall Summary Section -->
-            <div class="menu-section">
+            <div class="menu-section" id="overallSummarySection">
                 <div class="menu-section-title">
                     <span>Overall Summary</span>
                     <span>مجموعی خلاصہ</span>
@@ -80,6 +80,10 @@
                     <span class="summary-label">Total Other:</span>
                     <span class="summary-value">Rs. 0</span>
                 </div>
+                <button type="button" class="btn" style="width: 100%; margin-top: 10px; padding: 8px; background: #10b981; font-size: 12px; display: flex; align-items: center; justify-content: center; gap: 6px;" onclick="shareSummaryAsImage()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+                    <span>Share Summary (PNG)</span>
+                </button>
             </div>
 
             <!-- Total Financials Section -->
@@ -299,6 +303,9 @@
         </div>
     </div>
 
+    <!-- Hidden container for PNG capture -->
+    <div id="pngCaptureContainer"></div>
+    
     <script type="module" src="script.js"></script>
 </body>
 </html>

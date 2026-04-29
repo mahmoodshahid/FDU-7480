@@ -1,8 +1,108 @@
 // FDU 7480 Vehicle Expense Tracker Logic
 
-const APP_VERSION = "1.5.1";
+const APP_VERSION = "1.7.1";
 
 // Global functions for HTML access
+window.shareSummaryAsImage = function() {
+    const records = JSON.parse(localStorage.getItem('fdu7480_records') || '[]');
+    const totals = {
+        diesel: 0, toll: 0, jurmana: 0, khana: 0, driver: 0, digar: 0,
+        kiraya: 0, expenses: 0, bachat: 0
+    };
+    records.forEach(r => {
+        totals.diesel += r.diesel || 0;
+        totals.toll += r.toll || 0;
+        totals.jurmana += r.jurmana || 0;
+        totals.khana += r.khana || 0;
+        totals.driver += r.driver || 0;
+        totals.digar += r.digar || 0;
+        totals.kiraya += r.totalKiraya || 0;
+        totals.expenses += r.totalExpenses || 0;
+        totals.bachat += r.balance || 0;
+    });
+
+    const container = document.getElementById('pngCaptureContainer');
+    if (!container) return;
+
+    container.innerHTML = `
+        <div class="png-report-header">
+            <h1 style="font-size: 24px; margin: 0;">FDU 7480</h1>
+            <p style="margin: 5px 0 0; font-size: 14px;">Overall Summary | مجموعی خلاصہ</p>
+        </div>
+        <div class="png-report-body">
+            <div class="png-row">
+                <span class="png-label">کل کرایہ (Total Fare):</span>
+                <span class="png-value">Rs. ${totals.kiraya.toLocaleString()}</span>
+            </div>
+            <div class="png-row">
+                <span class="png-label">ڈیزل (Total Diesel):</span>
+                <span class="png-value">Rs. ${totals.diesel.toLocaleString()}</span>
+            </div>
+            <div class="png-row">
+                <span class="png-label">ٹول (Total Toll):</span>
+                <span class="png-value">Rs. ${totals.toll.toLocaleString()}</span>
+            </div>
+            <div class="png-row">
+                <span class="png-label">کھانا (Total Food):</span>
+                <span class="png-value">Rs. ${totals.khana.toLocaleString()}</span>
+            </div>
+            <div class="png-row">
+                <span class="png-label">ڈرائیور (Total Driver):</span>
+                <span class="png-value">Rs. ${totals.driver.toLocaleString()}</span>
+            </div>
+            <div class="png-row">
+                <span class="png-label">جرمانہ (Total Jurmana):</span>
+                <span class="png-value">Rs. ${totals.jurmana.toLocaleString()}</span>
+            </div>
+            <div class="png-row">
+                <span class="png-label">دیگر (Total Other):</span>
+                <span class="png-value">Rs. ${totals.digar.toLocaleString()}</span>
+            </div>
+            <div class="png-row" style="margin-top: 10px; border-top: 1px solid #ccc; padding-top: 10px;">
+                <span class="png-label">کل اخراجات (Total Expenses):</span>
+                <span class="png-value" style="color: #dc2626;">Rs. ${totals.expenses.toLocaleString()}</span>
+            </div>
+            <div class="png-row" style="margin-top: 10px; border-top: 2px solid #333; padding-top: 10px;">
+                <span class="png-label" style="font-size: 18px; color: #1e293b;">NET BACHAT:</span>
+                <span class="png-value" style="font-size: 22px; color: ${totals.bachat >= 0 ? '#059669' : '#dc2626'};">Rs. ${totals.bachat.toLocaleString()}</span>
+            </div>
+            <div style="text-align: center; margin-top: 20px; font-size: 11px; color: #64748b;">
+                Report generated on ${new Date().toLocaleDateString()}
+            </div>
+        </div>
+    `;
+
+    const btn = document.querySelector('[onclick="shareSummaryAsImage()"]');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = "...";
+    btn.disabled = true;
+
+    const h2c = window.html2canvas || (window.html2pdf && window.html2pdf.it && window.html2pdf.it.html2canvas);
+    if (h2c) {
+        h2c(container, { scale: 3, useCORS: true, backgroundColor: '#ffffff' }).then(canvas => {
+            canvas.toBlob(blob => {
+                const file = new File([blob], `Summary_${Date.now()}.png`, { type: 'image/png' });
+                if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+                    navigator.share({ files: [file], title: 'Trip Summary' })
+                    .catch(() => {
+                        const link = document.createElement('a');
+                        link.href = canvas.toDataURL('image/png');
+                        link.download = `Summary_${Date.now()}.png`;
+                        link.click();
+                    });
+                } else {
+                    const link = document.createElement('a');
+                    link.href = canvas.toDataURL('image/png');
+                    link.download = `Summary_${Date.now()}.png`;
+                    link.click();
+                }
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }, 'image/png');
+        });
+    }
+};
+
 window.printIndividualReceipt = function() {
     window.print();
 };
@@ -318,6 +418,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td><span class="${statusClass}" style="font-weight:700;">${bachatAmount}</span></td>
                 <td class="action-btns-cell">
                     <div style="display:flex; flex-direction:column; gap:4px;">
+                        <button class="btn-action btn-share-png" data-id="${record.id}" style="padding:4px 8px; font-size:10px; background:#10b981; color:white;">PNG</button>
                         <button class="btn-action btn-share" data-id="${record.id}" style="padding:4px 8px; font-size:10px;">PDF</button>
                         <button class="btn-action btn-delete" data-id="${record.id}" style="padding:4px 8px; font-size:10px; background:#fee2e2; color:#ef4444;">Del</button>
                     </div>
@@ -346,8 +447,105 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (target.classList.contains('btn-share')) {
             const id = Number(target.getAttribute('data-id'));
             shareRecord(id);
+        } else if (target.classList.contains('btn-share-png')) {
+            const id = Number(target.getAttribute('data-id'));
+            shareRecordAsPNG(id);
         }
     });
+
+    function shareRecordAsPNG(id) {
+        const records = JSON.parse(localStorage.getItem('fdu7480_records') || '[]');
+        const record = records.find(r => r.id === id);
+        if (!record) return;
+
+        const container = document.getElementById('pngCaptureContainer');
+        if (!container) return;
+
+        const dateStr = formatDate(record.dateGoing);
+        const bachatStatus = record.balance >= 0 ? 'Bachat (Profit)' : 'Nuqsan (Loss)';
+        const bachatStatusUrdu = record.balance >= 0 ? 'بچت' : 'نقصان';
+
+        container.innerHTML = `
+            <div class="png-report-header">
+                <h1 style="font-size: 24px; margin: 0;">FDU 7480</h1>
+                <p style="margin: 5px 0 0; font-size: 14px;">Trip Report | رپورٹ برائے تاریخ: ${dateStr}</p>
+            </div>
+            <div class="png-report-body">
+                <div class="png-row">
+                    <span class="png-label">Date (تاریخ):</span>
+                    <span class="png-value">${dateStr}</span>
+                </div>
+                <div class="png-row">
+                    <span class="png-label">From (روانگی):</span>
+                    <span class="png-value">${record.rawangiGoing} → ${record.stopGoing}</span>
+                </div>
+                ${record.dateReturn ? `
+                <div class="png-row">
+                    <span class="png-label">Return (واپسی):</span>
+                    <span class="png-value">${record.rawangiReturn} → ${record.stopReturn}</span>
+                </div>
+                ` : ''}
+                <div class="png-row" style="margin-top: 10px; border-top: 1px solid #ccc; padding-top: 10px;">
+                    <span class="png-label">Total Fare (کل کرایہ):</span>
+                    <span class="png-value">Rs. ${record.totalKiraya.toLocaleString()}</span>
+                </div>
+                <div class="png-row">
+                    <span class="png-label">Diesel (ڈیزل):</span>
+                    <span class="png-value">Rs. ${record.diesel.toLocaleString()}</span>
+                </div>
+                <div class="png-row">
+                    <span class="png-label">Toll (ٹول):</span>
+                    <span class="png-value">Rs. ${record.toll.toLocaleString()}</span>
+                </div>
+                <div class="png-row">
+                    <span class="png-label">Food (کھانا):</span>
+                    <span class="png-value">Rs. ${record.khana.toLocaleString()}</span>
+                </div>
+                <div class="png-row">
+                    <span class="png-label">Driver (ڈرائیور):</span>
+                    <span class="png-value">Rs. ${record.driver.toLocaleString()}</span>
+                </div>
+                <div class="png-row">
+                    <span class="png-label">Other (دیگر):</span>
+                    <span class="png-value">Rs. ${record.digar.toLocaleString()}</span>
+                </div>
+                <div class="png-row" style="margin-top: 10px; border-top: 2px solid #333; padding-top: 10px;">
+                    <span class="png-label" style="font-size: 18px; color: #1e293b;">${bachatStatus} (${bachatStatusUrdu}):</span>
+                    <span class="png-value" style="font-size: 20px; color: ${record.balance >= 0 ? '#059669' : '#dc2626'};">Rs. ${Math.abs(record.balance).toLocaleString()}</span>
+                </div>
+                <div style="text-align: center; margin-top: 20px; font-size: 12px; color: #64748b; border-top: 1px solid #eee; padding-top: 10px;">
+                    Generated by FDU 7480 App
+                </div>
+            </div>
+        `;
+
+        // Capture as Image
+        const h2c = window.html2canvas || (window.html2pdf && window.html2pdf.it && window.html2pdf.it.html2canvas);
+        if (h2c) {
+            h2c(container, { scale: 3, useCORS: true, backgroundColor: '#ffffff' }).then(canvas => {
+                canvas.toBlob(blob => {
+                    const file = new File([blob], `Trip_Report_${record.dateGoing}.png`, { type: 'image/png' });
+                    if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+                        navigator.share({
+                            files: [file],
+                            title: `Trip Report ${dateStr}`,
+                            text: `FDU 7480 Report for ${dateStr}`
+                        }).catch(err => {
+                            const link = document.createElement('a');
+                            link.href = canvas.toDataURL('image/png');
+                            link.download = `Trip_Report_${record.dateGoing}.png`;
+                            link.click();
+                        });
+                    } else {
+                        const link = document.createElement('a');
+                        link.href = canvas.toDataURL('image/png');
+                        link.download = `Trip_Report_${record.dateGoing}.png`;
+                        link.click();
+                    }
+                }, 'image/png');
+            });
+        }
+    }
 
     // Share/Print Individual Record
     function shareRecord(id) {

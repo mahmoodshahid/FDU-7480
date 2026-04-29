@@ -117,8 +117,11 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderRecords() {
         const records = JSON.parse(localStorage.getItem('fdu7480_records') || '[]');
         recordsTableBody.innerHTML = '';
+        
+        let grandTotal = 0;
 
         records.forEach(record => {
+            grandTotal += record.balance;
             const row = document.createElement('tr');
             const statusClass = record.balance >= 0 ? 'status-bachat' : 'status-nuqsan';
             const statusText = record.balance >= 0 ? 'Bachat' : 'Nuqsan';
@@ -139,6 +142,11 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
             recordsTableBody.appendChild(row);
         });
+
+        // Update Grand Total in Header
+        const grandTotalElement = document.getElementById('grandTotalAmount');
+        grandTotalElement.textContent = `Rs. ${grandTotal.toLocaleString()}`;
+        grandTotalElement.style.color = grandTotal >= 0 ? '#10b981' : '#ef4444';
 
         // Add delete event listeners
         document.querySelectorAll('.btn-delete').forEach(btn => {

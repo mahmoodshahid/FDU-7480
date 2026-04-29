@@ -1,5 +1,5 @@
 {
-  "version": "2.0.0",
-  "message": "Update 2.0.0: Unified PDF sharing for all reports. WhatsApp and PNG options removed for better reliability. | تمام رپورٹس کے لیے پی ڈی ایف شیئرنگ کی سہولت۔ بہتر کارکردگی کے لیے واٹس ایپ اور پی این جی کے آپشنز ختم کر دیے گئے ہیں۔",
+  "version": "2.1.0",
+  "message": "Update 2.1.0: Better PDF sharing on mobile and restored WhatsApp text share option for 100% reliability. | موبائل پر پی ڈی ایف کی بہتر شیئرنگ اور واٹس ایپ پر ٹیکسٹ شیئرنگ کی نئی سہولت۔",
   "forced": true
 }

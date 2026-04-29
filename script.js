@@ -23,86 +23,90 @@ window.shareSummaryAsPDF = function() {
     });
 
     const element = document.createElement('div');
+    element.style.width = '600px'; // Fixed width for consistent rendering
     element.style.padding = '30px';
     element.style.fontFamily = 'Arial, sans-serif';
-    element.style.backgroundColor = 'white';
+    element.style.lineHeight = '1.4';
+    element.style.color = '#000';
+    element.style.backgroundColor = '#fff';
     
     element.innerHTML = `
-        <div style="text-align: center; border-bottom: 2px solid #1e40af; padding-bottom: 20px; margin-bottom: 30px;">
-            <h1 style="font-size: 36px; margin: 0; color: #1e40af;">FDU 7480</h1>
-            <p style="margin: 5px 0; font-size: 16px; font-weight: 800; color: #fbbf24; text-transform: uppercase;">${userName}</p>
-            <p style="margin: 10px 0 0; font-size: 18px; color: #64748b; font-weight: bold;">Overall Summary | مجموعی خلاصہ</p>
+        <div style="text-align: center; border-bottom: 3px solid #1e40af; padding-bottom: 20px; margin-bottom: 30px;">
+            <h1 style="font-size: 38px; margin: 0; color: #1e40af; font-weight: 900;">FDU 7480</h1>
+            <p style="margin: 5px 0; font-size: 18px; font-weight: 800; color: #b45309; text-transform: uppercase;">${userName}</p>
+            <p style="margin: 10px 0 0; font-size: 20px; color: #475569; font-weight: 900;">Overall Summary | مجموعی خلاصہ</p>
         </div>
-        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 25px;">
-            <table style="width: 100%; border-collapse: collapse; font-size: 16px;">
+        <div style="border: 2px solid #e2e8f0; border-radius: 12px; padding: 25px;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 18px;">
                 <tr style="border-bottom: 1px solid #e2e8f0;">
-                    <td style="padding: 12px 0;">Total Fare (کل کرایہ):</td>
-                    <td style="padding: 12px 0; text-align: right; font-weight: 900; color: #1e40af;">Rs. ${totals.kiraya.toLocaleString()}</td>
+                    <td style="padding: 15px 0; font-weight: 700;">Total Fare (کل کرایہ):</td>
+                    <td style="padding: 15px 0; text-align: right; font-weight: 900; color: #1e40af;">Rs. ${totals.kiraya.toLocaleString()}</td>
                 </tr>
                 <tr style="border-bottom: 1px solid #e2e8f0;">
-                    <td style="padding: 12px 0;">Total Diesel (ڈیزل):</td>
+                    <td style="padding: 12px 0; font-weight: 700;">Total Diesel (ڈیزل):</td>
                     <td style="padding: 12px 0; text-align: right; font-weight: 700;">Rs. ${totals.diesel.toLocaleString()}</td>
                 </tr>
                 <tr style="border-bottom: 1px solid #e2e8f0;">
-                    <td style="padding: 12px 0;">Total Toll (ٹول):</td>
+                    <td style="padding: 12px 0; font-weight: 700;">Total Toll (ٹول):</td>
                     <td style="padding: 12px 0; text-align: right; font-weight: 700;">Rs. ${totals.toll.toLocaleString()}</td>
                 </tr>
                 <tr style="border-bottom: 1px solid #e2e8f0;">
-                    <td style="padding: 12px 0;">Total Food (کھانا):</td>
-                    <td style="padding: 12px 0; text-align: right; font-weight: 700;">Rs. ${totals.khana.toLocaleString()}</td>
+                    <td style="padding: 12px 0; font-weight: 700;">Total Expenses (اخراجات):</td>
+                    <td style="padding: 12px 0; text-align: right; font-weight: 700; color: #dc2626;">Rs. ${totals.expenses.toLocaleString()}</td>
                 </tr>
-                <tr style="border-bottom: 1px solid #e2e8f0;">
-                    <td style="padding: 12px 0;">Total Driver (ڈرائیور):</td>
-                    <td style="padding: 12px 0; text-align: right; font-weight: 700;">Rs. ${totals.driver.toLocaleString()}</td>
-                </tr>
-                <tr style="border-bottom: 1px solid #e2e8f0;">
-                    <td style="padding: 12px 0;">Total Other (دیگر):</td>
-                    <td style="padding: 12px 0; text-align: right; font-weight: 700;">Rs. ${totals.digar.toLocaleString()}</td>
-                </tr>
-                <tr style="background: #f1f5f9;">
-                    <td style="padding: 20px 10px; font-size: 20px; font-weight: 900; color: #1e293b;">NET BACHAT:</td>
-                    <td style="padding: 20px 10px; text-align: right; font-size: 24px; font-weight: 950; color: ${totals.bachat >= 0 ? '#059669' : '#dc2626'};">Rs. ${totals.bachat.toLocaleString()}</td>
+                <tr style="background: #f8fafc;">
+                    <td style="padding: 25px 15px; font-size: 24px; font-weight: 900; color: #1e293b; border-top: 3px double #333;">NET BACHAT:</td>
+                    <td style="padding: 25px 15px; text-align: right; font-size: 32px; font-weight: 950; color: ${totals.bachat >= 0 ? '#059669' : '#dc2626'}; border-top: 3px double #333;">Rs. ${totals.bachat.toLocaleString()}</td>
                 </tr>
             </table>
-            <div style="text-align: center; margin-top: 40px; font-size: 13px; color: #94a3b8; border-top: 1px solid #e2e8f0; padding-top: 20px;">
-                Report generated by ${userName} for FDU 7480 on ${new Date().toLocaleDateString()}
+            <div style="text-align: center; margin-top: 50px; font-size: 14px; color: #64748b; border-top: 1px solid #e2e8f0; padding-top: 20px; font-weight: 700;">
+                Generated by ${userName} for Vehicle FDU 7480 on ${new Date().toLocaleDateString()}
             </div>
         </div>
     `;
 
+    document.body.appendChild(element);
+    element.style.position = 'fixed';
+    element.style.left = '-9999px';
+
     const btn = document.querySelector('[onclick="shareSummaryAsPDF()"]');
     const originalText = btn.innerHTML;
-    btn.innerHTML = "...";
+    btn.innerHTML = "Generating...";
     btn.disabled = true;
-
-    if (!window.html2pdf) {
-        alert("PDF Library not loaded. Please refresh.");
-        btn.innerHTML = originalText;
-        btn.disabled = false;
-        return;
-    }
 
     const opt = {
         margin: [10, 10],
         filename: 'FDU7480_Summary.pdf',
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
+        html2canvas: { scale: 1.5, useCORS: true, backgroundColor: '#ffffff', logging: false },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
 
-    window.html2pdf().from(element).set(opt).toPdf().get('pdf').then(function (pdf) {
+    window.html2pdf().from(element).set(opt).toPdf().get('pdf').then(function(pdf) {
+        // Direct output for reliability on mobile
+        const blob = pdf.output('blob');
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = opt.filename;
+        
+        // Try sharing first
         if (navigator.share && navigator.canShare) {
-            const pdfBlob = pdf.output('blob');
-            const file = new File([pdfBlob], 'Overall_Summary.pdf', { type: 'application/pdf' });
+            const file = new File([blob], opt.filename, { type: 'application/pdf' });
             if (navigator.canShare({ files: [file] })) {
-                navigator.share({ files: [file], title: 'Overall Summary' }).catch(() => pdf.save());
+                navigator.share({
+                    files: [file],
+                    title: 'Trip Summary',
+                    text: 'FDU 7480 Overall Summary'
+                }).catch(() => link.click());
             } else {
-                pdf.save();
+                link.click();
             }
         } else {
-            pdf.save();
+            link.click();
         }
     }).finally(() => {
+        document.body.removeChild(element);
         btn.innerHTML = originalText;
         btn.disabled = false;
     });
@@ -118,55 +122,52 @@ window.downloadReceiptPDF = function() {
 
     const btn = document.querySelector('[onclick="downloadReceiptPDF()"]');
     const originalText = btn.innerHTML;
-    btn.innerHTML = "Processing... (تیار ہو رہا ہے)";
+    btn.innerHTML = "Processing...";
     btn.disabled = true;
 
     if (!window.html2pdf) {
-        alert("Library loading... Try in 5s.");
+        alert("PDF Library not loaded. Refresh page.");
         btn.innerHTML = originalText;
         btn.disabled = false;
         return;
     }
 
-    setTimeout(() => {
-        const opt = {
-            margin: [10, 10],
-            filename: `FDU7480_Trip_${Date.now()}.pdf`,
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        };
-        
-        window.html2pdf().from(element).set(opt).toPdf().get('pdf').then(function (pdf) {
-            // For mobile, we try to use the share API if available
-            if (navigator.share && navigator.canShare) {
-                const pdfBlob = pdf.output('blob');
-                const file = new File([pdfBlob], `Trip_Receipt_${Date.now()}.pdf`, { type: 'application/pdf' });
-                
-                if (navigator.canShare({ files: [file] })) {
-                    navigator.share({
-                        files: [file],
-                        title: 'Trip Receipt',
-                        text: 'FDU 7480 Receipt'
-                    }).catch(err => {
-                        console.log('Share failed, saving normally');
-                        pdf.save();
-                    });
-                } else {
-                    pdf.save();
-                }
+    const opt = {
+        margin: [10, 10],
+        filename: `FDU7480_Receipt.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 1.5, useCORS: true, backgroundColor: '#ffffff', logging: false },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+    
+    window.html2pdf().from(element).set(opt).toPdf().get('pdf').then(function(pdf) {
+        const blob = pdf.output('blob');
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = opt.filename;
+
+        if (navigator.share && navigator.canShare) {
+            const file = new File([blob], opt.filename, { type: 'application/pdf' });
+            if (navigator.canShare({ files: [file] })) {
+                navigator.share({
+                    files: [file],
+                    title: 'Trip Receipt',
+                    text: 'FDU 7480 Vehicle Receipt'
+                }).catch(() => link.click());
             } else {
-                pdf.save();
+                link.click();
             }
-            btn.innerHTML = originalText;
-            btn.disabled = false;
-        }).catch(err => {
-            console.error('PDF Error:', err);
-            btn.innerHTML = originalText;
-            btn.disabled = false;
-            window.print();
-        });
-    }, 500); 
+        } else {
+            link.click();
+        }
+    }).catch(err => {
+        console.error('PDF Error:', err);
+        window.print();
+    }).finally(() => {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    });
 };
 
 window.closeModal = function() {
@@ -438,11 +439,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td><span class="${statusClass}">${bachatAmount}</span></td>
                 <td class="action-btns-cell">
                     <div style="display:flex; flex-direction:column; gap:6px;">
-                        <button class="btn-action btn-share" data-id="${record.id}" style="padding:8px 12px; font-size:12px; font-weight:800; background:#3b82f6; color:white; border-radius:6px; display:flex; align-items:center; justify-content:center; gap:4px;">
-                             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                        <button class="btn-action btn-share" data-id="${record.id}" style="padding:10px 14px; font-size:12px; font-weight:900; background:#3b82f6; color:white; border-radius:8px; display:flex; align-items:center; justify-content:center; gap:6px;">
+                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                              PDF
                         </button>
-                        <button class="btn-action btn-delete" data-id="${record.id}" style="padding:6px 12px; font-size:11px; background:#fee2e2; color:#ef4444; border-radius:6px; font-weight:700;">Del</button>
+                        <button class="btn-action btn-share-wa" data-id="${record.id}" style="padding:8px 14px; font-size:11px; font-weight:800; background:#22c55e; color:white; border-radius:8px; display:flex; align-items:center; justify-content:center; gap:4px;">
+                             WA
+                        </button>
+                        <button class="btn-action btn-delete" data-id="${record.id}" style="padding:8px 14px; font-size:11px; background:#fee2e2; color:#ef4444; border-radius:8px; font-weight:700;">Del</button>
                     </div>
                 </td>
             `;
@@ -470,8 +474,29 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (target.classList.contains('btn-share')) {
             const id = Number(target.getAttribute('data-id'));
             shareRecord(id);
+        } else if (target.classList.contains('btn-share-wa')) {
+            const id = Number(target.getAttribute('data-id'));
+            shareWhatsAppRecord(id);
         }
     });
+
+    function shareWhatsAppRecord(id) {
+        const records = JSON.parse(localStorage.getItem('fdu7480_records') || '[]');
+        const record = records.find(r => r.id === id);
+        if (!record) return;
+
+        const userName = userNameInput.value || "Driver";
+        const balanceTxt = record.balance >= 0 ? "Bachat" : "Nuqsan";
+        
+        const text = `*FDU 7480 Report*\n` +
+                     `*Driver:* ${userName}\n` +
+                     `*Route:* ${record.rawangiGoing} to ${record.stopGoing}\n` +
+                     `*Fare:* Rs ${record.totalKiraya.toLocaleString()}\n` +
+                     `*Expenses:* Rs ${record.totalExpenses.toLocaleString()}\n` +
+                     `*${balanceTxt}:* Rs ${Math.abs(record.balance).toLocaleString()}\n`;
+        
+        window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+    }
 
     // Share/Print Individual Record
     function shareRecord(id) {

@@ -83,30 +83,34 @@ window.shareSummaryAsPDF = function() {
     };
 
     window.html2pdf().from(element).set(opt).toPdf().get('pdf').then(function(pdf) {
-        // Direct output for reliability on mobile
-        const blob = pdf.output('blob');
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = opt.filename;
-        
-        // Try sharing first
+        const pdfBlob = pdf.output('blob');
+        const fileName = 'FDU7480_Summary.pdf';
+
+        // Check for sharing support
         if (navigator.share && navigator.canShare) {
-            const file = new File([blob], opt.filename, { type: 'application/pdf' });
+            const file = new File([pdfBlob], fileName, { type: 'application/pdf' });
             if (navigator.canShare({ files: [file] })) {
                 navigator.share({
                     files: [file],
-                    title: 'Trip Summary',
-                    text: 'FDU 7480 Overall Summary'
-                }).catch(() => link.click());
+                    title: 'FDU 7480 Summary',
+                    text: 'Overall Trip Summary Report'
+                }).catch(() => {
+                    // Fallback to direct save
+                    pdf.save(fileName);
+                });
             } else {
-                link.click();
+                pdf.save(fileName);
             }
         } else {
-            link.click();
+            pdf.save(fileName);
         }
+    }).catch(err => {
+        console.error("Summary PDF Error:", err);
+        alert("Could not create PDF. Please try again.");
     }).finally(() => {
-        document.body.removeChild(element);
+        if (document.body.contains(element)) {
+            document.body.removeChild(element);
+        }
         btn.innerHTML = originalText;
         btn.disabled = false;
     });
@@ -141,25 +145,24 @@ window.downloadReceiptPDF = function() {
     };
     
     window.html2pdf().from(element).set(opt).toPdf().get('pdf').then(function(pdf) {
-        const blob = pdf.output('blob');
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = opt.filename;
+        const pdfBlob = pdf.output('blob');
+        const fileName = opt.filename;
 
         if (navigator.share && navigator.canShare) {
-            const file = new File([blob], opt.filename, { type: 'application/pdf' });
+            const file = new File([pdfBlob], fileName, { type: 'application/pdf' });
             if (navigator.canShare({ files: [file] })) {
                 navigator.share({
                     files: [file],
                     title: 'Trip Receipt',
                     text: 'FDU 7480 Vehicle Receipt'
-                }).catch(() => link.click());
+                }).catch(() => {
+                    pdf.save(fileName);
+                });
             } else {
-                link.click();
+                pdf.save(fileName);
             }
         } else {
-            link.click();
+            pdf.save(fileName);
         }
     }).catch(err => {
         console.error('PDF Error:', err);

@@ -1,5 +1,5 @@
 {
-  "version": "2.1.0",
-  "message": "Update 2.1.0: Better PDF sharing on mobile and restored WhatsApp text share option for 100% reliability. | موبائل پر پی ڈی ایف کی بہتر شیئرنگ اور واٹس ایپ پر ٹیکسٹ شیئرنگ کی نئی سہولت۔",
+  "version": "2.1.1",
+  "message": "Update 2.1.1: Fixed PDF generation and sharing for mobile devices. PDFs will now correctly save or share on smartphones. | موبائل پر پی ڈی ایف بنانے اور شیئر کرنے کے مسائل حل کر دیے گئے ہیں۔ اب پی ڈی ایف فائلیں موبائل پر بھی محفوظ ہوں گی۔",
   "forced": true
 }

@@ -1,6 +1,6 @@
 // FDU 7480 Vehicle Expense Tracker Logic
 
-const APP_VERSION = "1.0.2";
+const APP_VERSION = "1.0.4";
 
 // Global functions for HTML access
 window.printIndividualReceipt = function() {
@@ -14,45 +14,44 @@ window.downloadReceiptPDF = function() {
     // Show a loading indicator
     const btn = document.querySelector('[onclick="downloadReceiptPDF()"]');
     const originalText = btn.innerHTML;
-    btn.innerHTML = "Generating... (تیار ہو رہا ہے)";
+    btn.innerHTML = "Processing... (لوڈ ہو رہا ہے)";
     btn.disabled = true;
+
+    // Check if html2pdf is available
+    if (!window.html2pdf) {
+        alert("PDF Library is still loading. Please wait 5 seconds. | پی ڈی ایف لائبریری ابھی لوڈ ہو رہی ہے، براہ کرم 5 سیکنڈ انتظار کریں۔");
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+        return;
+    }
 
     // Small delay to ensure any rendering in modal is settled
     setTimeout(() => {
         const opt = {
-            margin: [5, 5],
-            filename: `FDU7480_Receipt_${Date.now()}.pdf`,
-            image: { type: 'jpeg', quality: 0.95 },
+            margin: [10, 10, 10, 10],
+            filename: `Receipt_FDU7480_${Date.now()}.pdf`,
+            image: { type: 'jpeg', quality: 0.98 },
             html2canvas: { 
-                scale: 1, // Use scale 1 for maximum mobile compatibility
+                scale: 2, 
                 useCORS: true,
                 backgroundColor: '#ffffff',
-                scrollY: 0,
-                scrollX: 0,
-                logging: false,
-                width: element.offsetWidth,
-                windowWidth: element.offsetWidth
+                letterRendering: true,
+                scrollY: -window.scrollY
             },
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
         };
         
-        if (window.html2pdf) {
-            window.html2pdf().from(element).set(opt).save().then(() => {
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-            }).catch(err => {
-                console.error('PDF Error:', err);
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-                alert("PDF Download failed on this device. Opening Print view... | پی ڈی ایف ڈاؤن لوڈ کام نہیں کر رہا، پرنٹ ویو کھل رہا ہے۔");
-                window.print();
-            });
-        } else {
+        window.html2pdf().from(element).set(opt).save().then(() => {
             btn.innerHTML = originalText;
             btn.disabled = false;
-            alert("Library not ready. Try again in a moment.");
-        }
-    }, 800); 
+        }).catch(err => {
+            console.error('PDF Error:', err);
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+            alert("Mobile PDF Failed. Opening standard print view... | موبائل پی ڈی ایف ناکام رہا، پرنٹ ویو کھولا جا رہا ہے۔");
+            window.print();
+        });
+    }, 500); 
 };
 
 window.closeModal = function() {
@@ -86,28 +85,31 @@ document.addEventListener('DOMContentLoaded', () => {
     // Check for updates
     async function checkForUpdates() {
         try {
-            const response = await fetch('/version.json?t=' + Date.now());
+            console.log('Checking for updates... Current version:', APP_VERSION);
+            const response = await fetch('/version.json?nocache=' + Date.now());
             if (response.ok) {
                 const data = await response.json();
+                console.log('Server version:', data.version);
                 const lastSeenVersion = localStorage.getItem('fdu7480_app_version');
                 
                 if (data.version !== APP_VERSION && data.version !== lastSeenVersion) {
                     const updateToast = document.getElementById('updateToast');
                     const updateMessage = document.getElementById('updateMessage');
-                    updateMessage.textContent = data.message;
-                    updateToast.style.display = 'block';
-                    
-                    // Add close functionality
-                    updateToast.onclick = (e) => {
-                        if (e.target.tagName !== 'BUTTON') {
-                            updateToast.style.display = 'none';
-                            localStorage.setItem('fdu7480_app_version', data.version);
-                        }
-                    };
+                    if (updateToast && updateMessage) {
+                        updateMessage.textContent = data.message;
+                        updateToast.style.display = 'block';
+                        
+                        updateToast.onclick = (e) => {
+                            if (e.target.tagName !== 'BUTTON') {
+                                updateToast.style.display = 'none';
+                                localStorage.setItem('fdu7480_app_version', data.version);
+                            }
+                        };
+                    }
                 }
             }
         } catch (error) {
-            console.log('Update check failed:', error);
+            console.warn('Update check failed:', error);
         }
     }
 

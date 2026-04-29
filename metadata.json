@@ -1,0 +1,6 @@
+{
+  "name": "FDU 7480 Vehicle Expense Tracker",
+  "description": "A professional transport business vehicle expense tracker for 'FDU 7480' with Urdu labels, record calculation, and localStorage persistence.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}

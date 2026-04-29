@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FDU 7480 - Vehicle Expense Tracker</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div>
+            <h1>FDU 7480</h1>
+            <p>Vehicle Expense Tracker | وہیکل ایکسپنس ٹریکر</p>
+        </div>
+        <button type="button" class="btn btn-print" style="width: auto; margin: 0; padding: 6px 16px;" onclick="printReport()">Print Report</button>
+    </header>
+
+    <main class="main-content">
+        <form id="tripForm">
+            <!-- Trip Section -->
+            <div class="card">
+                <h2>
+                    <span>Trip Details</span>
+                    <span class="urdu-text">ٹارگٹ اور تاریخ</span>
+                </h2>
+                <div class="form-group">
+                    <div class="label-container">
+                        <label for="tripDate">Select Date (تاریخ)</label>
+                    </div>
+                    <input type="date" id="tripDate" required>
+                </div>
+                <div class="form-group">
+                    <div class="label-container">
+                        <label for="trip1to2">Trip 1 to 2 (سفر 1 سے 2)</label>
+                    </div>
+                    <input type="text" id="trip1to2" placeholder="e.g. Lahore to Karachi" required>
+                </div>
+                <div class="form-group">
+                    <div class="label-container">
+                        <label for="trip2to1">Trip 2 to 1 (سفر 2 سے 1)</label>
+                    </div>
+                    <input type="text" id="trip2to1" placeholder="e.g. Karachi to Lahore" required>
+                </div>
+            </div>
+
+            <!-- Fare Section -->
+            <div class="card">
+                <h2>
+                    <span>Fare (Kiraya)</span>
+                    <span class="urdu-text">کرایہ</span>
+                </h2>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div class="form-group">
+                        <label for="kiraya1">Kiraya 1</label>
+                        <input type="number" id="kiraya1" placeholder="0" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="kiraya2">Kiraya 2</label>
+                        <input type="number" id="kiraya2" placeholder="0" min="0">
+                    </div>
+                </div>
+                <div class="total-display">
+                    <span>Total Kiraya</span>
+                    <span>Rs. <span id="totalKirayaDisplay">0</span></span>
+                </div>
+            </div>
+
+            <!-- Expenses Section -->
+            <div class="card expenses-card">
+                <h2>
+                    <span>Expenses</span>
+                    <span class="urdu-text">اخراجات</span>
+                </h2>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div class="form-group">
+                        <label for="diesel">Diesel</label>
+                        <input type="number" id="diesel" placeholder="0" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="toll">Toll</label>
+                        <input type="number" id="toll" placeholder="0" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="jurmana">Jurmana</label>
+                        <input type="number" id="jurmana" placeholder="0" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="khana">Khana</label>
+                        <input type="number" id="khana" placeholder="0" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="driver">Driver</label>
+                        <input type="number" id="driver" placeholder="0" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="digar">Digar</label>
+                        <input type="number" id="digar" placeholder="0" min="0">
+                    </div>
+                </div>
+                <div class="total-display">
+                    <span>Total Expenses</span>
+                    <span>Rs. <span id="totalExpensesDisplay">0</span></span>
+                </div>
+            </div>
+
+            <!-- Profit/Loss Section -->
+            <div class="card profit-loss-card">
+                <h2>
+                    <span>Result</span>
+                    <span class="urdu-text">نتیجہ</span>
+                </h2>
+                <div id="resultBadge" class="result-badge bachat">
+                    <span id="resultText">Profit (Bachat)</span>
+                    <span id="resultAmount">0</span>
+                </div>
+                <button type="submit" class="btn btn-primary">Save Record (محفوظ کریں)</button>
+            </div>
+        </form>
+
+        <section class="records-section">
+            <div class="card-title" style="font-size: 14px; font-weight: 600; margin-bottom: 12px; color: var(--primary-blue); display: flex; justify-content: space-between;">
+                <span>Recent Records</span>
+                <span class="urdu-text">حالیہ ریکارڈ</span>
+            </div>
+            <div class="table-container">
+                <table id="recordsTable">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Trip Details</th>
+                            <th>Total Kiraya</th>
+                            <th>Total Exp</th>
+                            <th>Bachat/Nuqsan</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Records will be injected here -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
+

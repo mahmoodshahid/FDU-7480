@@ -111,19 +111,32 @@ header p {
     color: #64748b;
 }
 
-.form-group input {
+.form-group input, 
+.form-group select {
     width: 100%;
-    padding: 8px;
+    padding: 10px;
     border: 1px solid #cbd5e1;
     border-radius: 6px;
-    font-size: 13px;
+    font-size: 14px;
+    background-color: white;
     transition: border-color 0.2s;
+    display: block;
 }
 
-.form-group input:focus {
+.form-group input:focus,
+.form-group select:focus {
     outline: none;
     border-color: var(--secondary-blue);
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-group select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 16px;
+    padding-right: 35px;
 }
 
 .total-display {
@@ -183,11 +196,11 @@ header p {
 }
 
 .btn {
-    padding: 10px;
-    border-radius: 6px;
+    padding: 14px;
+    border-radius: 8px;
     font-weight: 600;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 15px;
     border: none;
     width: 100%;
     transition: transform 0.1s;
@@ -269,6 +282,9 @@ td {
     direction: rtl;
     text-align: right;
     font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--primary-blue);
 }
 
 @media print {

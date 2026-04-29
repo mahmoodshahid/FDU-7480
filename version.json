@@ -1,4 +1,5 @@
 {
-  "version": "1.3.1",
-  "message": "Update 1.3.1: Fixed Delete button and Header styling. | ڈیلیٹ بٹن اور ہیڈر سٹائل ٹھیک کر دیا گیا ہے۔"
+  "version": "1.5.0",
+  "message": "Update 1.5.0: Moved records to side menu, sorted by date, and optimized for mobile viewing. | تمام ریکارڈز اب مینو میں ڈیٹ وائز دستیاب ہیں۔",
+  "forced": true
 }

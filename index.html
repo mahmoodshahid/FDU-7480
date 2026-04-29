@@ -33,9 +33,103 @@
             <button type="button" class="btn" style="width: auto; margin: 0; padding: 10px; background: rgba(255,255,255,0.2); border-radius: 8px; color: white;" onclick="window.location.reload(true)" title="Force Refresh">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
             </button>
-            <button type="button" class="btn btn-print" style="width: auto; margin: 0; padding: 10px 20px; background: #3b82f6;" onclick="printReport()">Report PDF</button>
+            <button type="button" id="menuBtn" class="btn" style="width: auto; margin: 0; padding: 10px 20px; background: #3b82f6; display: flex; align-items: center; gap: 8px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                <span>Menu</span>
+            </button>
         </div>
     </header>
+
+    <!-- Side Menu Drawer -->
+    <div id="menuBackdrop" class="menu-backdrop"></div>
+    <aside id="sideMenu" class="side-menu">
+        <div class="menu-header">
+            <h2 style="color: white; border: none; margin: 0; font-size: 18px;">Trip Reports | رپورٹ</h2>
+            <button id="closeMenuBtn" class="btn-menu-close">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+        </div>
+        <div class="menu-body">
+            <!-- Overall Summary Section -->
+            <div class="menu-section">
+                <div class="menu-section-title">
+                    <span>Overall Summary</span>
+                    <span>مجموعی خلاصہ</span>
+                </div>
+                <div id="summaryDiesel" class="summary-item">
+                    <span class="summary-label">Total Diesel:</span>
+                    <span class="summary-value">Rs. 0</span>
+                </div>
+                <div id="summaryToll" class="summary-item">
+                    <span class="summary-label">Total Toll:</span>
+                    <span class="summary-value">Rs. 0</span>
+                </div>
+                <div id="summaryKhana" class="summary-item">
+                    <span class="summary-label">Total Khana:</span>
+                    <span class="summary-value">Rs. 0</span>
+                </div>
+                <div id="summaryDriver" class="summary-item">
+                    <span class="summary-label">Total Driver:</span>
+                    <span class="summary-value">Rs. 0</span>
+                </div>
+                <div id="summaryJurmana" class="summary-item">
+                    <span class="summary-label">Total Jurmana:</span>
+                    <span class="summary-value">Rs. 0</span>
+                </div>
+                <div id="summaryDigar" class="summary-item">
+                    <span class="summary-label">Total Other:</span>
+                    <span class="summary-value">Rs. 0</span>
+                </div>
+            </div>
+
+            <!-- Total Financials Section -->
+            <div class="menu-section">
+                <div class="menu-section-title">
+                    <span>Total Financials</span>
+                    <span>کل مالیات</span>
+                </div>
+                <div id="summaryKiraya" class="summary-item">
+                    <span class="summary-label">Total Fare (Kiraya):</span>
+                    <span class="summary-value" style="color: var(--primary-blue);">Rs. 0</span>
+                </div>
+                <div id="summaryExpenses" class="summary-item">
+                    <span class="summary-label">Total Expenses:</span>
+                    <span class="summary-value" style="color: var(--danger);">Rs. 0</span>
+                </div>
+                <div id="summaryBachat" class="summary-item" style="border-top: 2px solid var(--border-soft); margin-top: 10px; padding-top: 15px;">
+                    <span class="summary-label" style="font-weight: 800; color: var(--dark-slate);">NET BACHAT:</span>
+                    <span class="summary-value" style="font-size: 18px; color: var(--success);">Rs. 0</span>
+                </div>
+            </div>
+
+            <!-- Recent Records List Section -->
+            <div class="menu-section">
+                <div class="menu-section-title">
+                    <span>Recent Records</span>
+                    <span>حالیہ ریکارڈ</span>
+                </div>
+                <div class="table-container" style="max-height: 400px; overflow-y: auto;">
+                    <table id="recordsTable" style="font-size: 11px;">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Details</th>
+                                <th>Fare</th>
+                                <th>Result</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Records will be injected here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="menu-footer">
+            <button class="btn btn-print" onclick="printReport()">Download Full Report PDF</button>
+        </div>
+    </aside>
 
     <main class="main-content">
         <!-- Update Notification (Hidden by default) -->
@@ -189,30 +283,6 @@
                 <button type="submit" class="btn btn-primary">Save Record (محفوظ کریں)</button>
             </div>
         </form>
-
-        <section class="records-section">
-            <div class="card-title" style="font-size: 14px; font-weight: 600; margin-bottom: 12px; color: var(--primary-blue); display: flex; justify-content: space-between;">
-                <span>Recent Records</span>
-                <span class="urdu-text">حالیہ ریکارڈ</span>
-            </div>
-            <div class="table-container">
-                <table id="recordsTable">
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Trip Details</th>
-                            <th>Total Kiraya</th>
-                            <th>Total Exp</th>
-                            <th>Bachat/Nuqsan</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Records will be injected here -->
-                    </tbody>
-                </table>
-            </div>
-        </section>
     </main>
 
     <!-- Receipt Modal -->

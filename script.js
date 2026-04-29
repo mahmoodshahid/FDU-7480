@@ -1,6 +1,6 @@
 // FDU 7480 Vehicle Expense Tracker Logic
 
-const APP_VERSION = "1.3.1";
+const APP_VERSION = "1.5.0";
 
 // Global functions for HTML access
 window.printIndividualReceipt = function() {
@@ -121,6 +121,72 @@ document.addEventListener('DOMContentLoaded', () => {
     const resultText = document.getElementById('resultText');
     const resultAmount = document.getElementById('resultAmount');
 
+    // Menu Elements
+    const menuBtn = document.getElementById('menuBtn');
+    const closeMenuBtn = document.getElementById('closeMenuBtn');
+    const sideMenu = document.getElementById('sideMenu');
+    const menuBackdrop = document.getElementById('menuBackdrop');
+
+    // Menu Toggle Logic
+    function toggleMenu() {
+        sideMenu.classList.toggle('active');
+        menuBackdrop.style.display = sideMenu.classList.contains('active') ? 'block' : 'none';
+        
+        if (sideMenu.classList.contains('active')) {
+            document.body.style.overflow = 'hidden';
+            renderSummaryInMenu(); // Refresh summary when opening
+        } else {
+            document.body.style.overflow = '';
+        }
+    }
+
+    if (menuBtn) menuBtn.addEventListener('click', toggleMenu);
+    if (closeMenuBtn) closeMenuBtn.addEventListener('click', toggleMenu);
+    if (menuBackdrop) menuBackdrop.addEventListener('click', toggleMenu);
+
+    function renderSummaryInMenu() {
+        const records = JSON.parse(localStorage.getItem('fdu7480_records') || '[]');
+        
+        const totals = {
+            diesel: 0, toll: 0, jurmana: 0, khana: 0, driver: 0, digar: 0,
+            kiraya: 0, expenses: 0, bachat: 0
+        };
+
+        records.forEach(r => {
+            totals.diesel += r.diesel || 0;
+            totals.toll += r.toll || 0;
+            totals.jurmana += r.jurmana || 0;
+            totals.khana += r.khana || 0;
+            totals.driver += r.driver || 0;
+            totals.digar += r.digar || 0;
+            totals.kiraya += r.totalKiraya || 0;
+            totals.expenses += r.totalExpenses || 0;
+            totals.bachat += r.balance || 0;
+        });
+
+        // Inject into Menu
+        const updateVal = (id, val) => {
+            const el = document.querySelector(`#${id} .summary-value`);
+            if (el) el.textContent = `Rs. ${val.toLocaleString()}`;
+        };
+
+        updateVal('summaryDiesel', totals.diesel);
+        updateVal('summaryToll', totals.toll);
+        updateVal('summaryKhana', totals.khana);
+        updateVal('summaryDriver', totals.driver);
+        updateVal('summaryJurmana', totals.jurmana);
+        updateVal('summaryDigar', totals.digar);
+        updateVal('summaryKiraya', totals.kiraya);
+        updateVal('summaryExpenses', totals.expenses);
+        updateVal('summaryBachat', totals.bachat);
+
+        // Color coding bachat
+        const bachatEl = document.querySelector('#summaryBachat .summary-value');
+        if (bachatEl) {
+            bachatEl.style.color = totals.bachat >= 0 ? '#059669' : '#dc2626';
+        }
+    }
+
     // Fare inputs
     const kiraya1Input = document.getElementById('kiraya1');
     const kiraya2Input = document.getElementById('kiraya2');
@@ -233,27 +299,28 @@ document.addEventListener('DOMContentLoaded', () => {
         
         let grandTotal = 0;
 
+        // Sort records by date descending
+        records.sort((a, b) => new Date(b.dateGoing) - new Date(a.dateGoing));
+
         records.forEach(record => {
             grandTotal += record.balance;
             const row = document.createElement('tr');
             const statusClass = record.balance >= 0 ? 'status-bachat' : 'status-nuqsan';
-            const statusText = record.balance >= 0 ? 'Bachat' : 'Nuqsan';
-            const balanceDisplay = `<span class="${statusClass}">${Math.abs(record.balance).toLocaleString()} ${statusText}</span>`;
+            const bachatAmount = Math.abs(record.balance).toLocaleString();
 
-            const tripDisplay = `Going: ${record.rawangiGoing} → ${record.stopGoing}${record.stopReturn ? ' | Return: ' + record.rawangiReturn + ' → ' + record.stopReturn : ''}`;
-            const formattedDateGoing = formatDate(record.dateGoing);
-            const formattedDateReturn = formatDate(record.dateReturn);
-            const dateDisplay = `${formattedDateGoing}${record.dateReturn && record.dateReturn !== record.dateGoing ? ' / ' + formattedDateReturn : ''}`;
+            const tripDisplay = `${record.stopGoing}${record.stopReturn ? ' / ' + record.stopReturn : ''}`;
+            const formattedDate = formatDate(record.dateGoing);
 
             row.innerHTML = `
-                <td>${dateDisplay}</td>
+                <td>${formattedDate}</td>
                 <td>${tripDisplay}</td>
                 <td>${record.totalKiraya.toLocaleString()}</td>
-                <td>${record.totalExpenses.toLocaleString()}</td>
-                <td>${balanceDisplay}</td>
+                <td><span class="${statusClass}" style="font-weight:700;">${bachatAmount}</span></td>
                 <td class="action-btns-cell">
-                    <button class="btn-action btn-share" data-id="${record.id}">PDF / Share</button>
-                    <button class="btn-action btn-delete" data-id="${record.id}">Delete</button>
+                    <div style="display:flex; flex-direction:column; gap:4px;">
+                        <button class="btn-action btn-share" data-id="${record.id}" style="padding:4px 8px; font-size:10px;">PDF</button>
+                        <button class="btn-action btn-delete" data-id="${record.id}" style="padding:4px 8px; font-size:10px; background:#fee2e2; color:#ef4444;">Del</button>
+                    </div>
                 </td>
             `;
             recordsTableBody.appendChild(row);
@@ -265,6 +332,9 @@ document.addEventListener('DOMContentLoaded', () => {
             grandTotalElement.textContent = `Rs. ${grandTotal.toLocaleString()}`;
             grandTotalElement.style.color = grandTotal >= 0 ? '#10b981' : '#ef4444';
         }
+
+        // Also update menu summary
+        renderSummaryInMenu();
     }
 
     // Event Delegation for Table Actions

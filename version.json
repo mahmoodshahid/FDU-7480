@@ -1,5 +1,5 @@
 {
-  "version": "2.1.2",
-  "message": "Update 2.1.2: Reinforced PDF saving for mobile. If sharing fails, the PDF will now automatically download to your device for 100% reliability. | موبائل پر پی ڈی ایف سیو کرنے کے مسئلے کا مستقل حل۔ اگر شیئرنگ کام نہ کرے تو فائل خود بخود ڈاؤن لوڈ ہو جائے گی۔",
+  "version": "2.2.0",
+  "message": "Update 2.2.0: Improved PDF downloads and restored WhatsApp Quick Share for maximum reliability on all mobile devices. | موبائل پر پی ڈی ایف ڈاؤن لوڈ اور واٹس ایپ پر فوری رپورٹ شیئر کرنے کی بہتر سہولت۔",
   "forced": true
 }

@@ -1,6 +1,6 @@
 // FDU 7480 Vehicle Expense Tracker Logic
 
-const APP_VERSION = "2.0.0";
+const APP_VERSION = "2.1.2";
 
 // Global functions for HTML access
 window.shareSummaryAsPDF = function() {
@@ -88,21 +88,24 @@ window.shareSummaryAsPDF = function() {
 
         // Check for sharing support
         if (navigator.share && navigator.canShare) {
-            const file = new File([pdfBlob], fileName, { type: 'application/pdf' });
-            if (navigator.canShare({ files: [file] })) {
-                navigator.share({
-                    files: [file],
-                    title: 'FDU 7480 Summary',
-                    text: 'Overall Trip Summary Report'
-                }).catch(() => {
-                    // Fallback to direct save
-                    pdf.save(fileName);
-                });
-            } else {
-                pdf.save(fileName);
+            try {
+                const file = new File([pdfBlob], fileName, { type: 'application/pdf' });
+                if (navigator.canShare({ files: [file] })) {
+                    navigator.share({
+                        files: [file],
+                        title: 'FDU 7480 Summary',
+                        text: 'Overall Trip Summary Report'
+                    }).catch(() => {
+                        forceDownload(pdfBlob, fileName);
+                    });
+                } else {
+                    forceDownload(pdfBlob, fileName);
+                }
+            } catch (e) {
+                forceDownload(pdfBlob, fileName);
             }
         } else {
-            pdf.save(fileName);
+            forceDownload(pdfBlob, fileName);
         }
     }).catch(err => {
         console.error("Summary PDF Error:", err);
@@ -115,6 +118,20 @@ window.shareSummaryAsPDF = function() {
         btn.disabled = false;
     });
 };
+
+function forceDownload(blob, fileName) {
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.style.display = 'none';
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+    }, 100);
+}
 
 window.printIndividualReceipt = function() {
     window.print();
@@ -149,20 +166,24 @@ window.downloadReceiptPDF = function() {
         const fileName = opt.filename;
 
         if (navigator.share && navigator.canShare) {
-            const file = new File([pdfBlob], fileName, { type: 'application/pdf' });
-            if (navigator.canShare({ files: [file] })) {
-                navigator.share({
-                    files: [file],
-                    title: 'Trip Receipt',
-                    text: 'FDU 7480 Vehicle Receipt'
-                }).catch(() => {
-                    pdf.save(fileName);
-                });
-            } else {
-                pdf.save(fileName);
+            try {
+                const file = new File([pdfBlob], fileName, { type: 'application/pdf' });
+                if (navigator.canShare({ files: [file] })) {
+                    navigator.share({
+                        files: [file],
+                        title: 'Trip Receipt',
+                        text: 'FDU 7480 Vehicle Receipt'
+                    }).catch(() => {
+                        forceDownload(pdfBlob, fileName);
+                    });
+                } else {
+                    forceDownload(pdfBlob, fileName);
+                }
+            } catch (e) {
+                forceDownload(pdfBlob, fileName);
             }
         } else {
-            pdf.save(fileName);
+            forceDownload(pdfBlob, fileName);
         }
     }).catch(err => {
         console.error('PDF Error:', err);

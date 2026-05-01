@@ -1,5 +1,5 @@
 {
-  "version": "2.1.1",
-  "message": "Update 2.1.1: Fixed PDF generation and sharing for mobile devices. PDFs will now correctly save or share on smartphones. | موبائل پر پی ڈی ایف بنانے اور شیئر کرنے کے مسائل حل کر دیے گئے ہیں۔ اب پی ڈی ایف فائلیں موبائل پر بھی محفوظ ہوں گی۔",
+  "version": "2.1.2",
+  "message": "Update 2.1.2: Reinforced PDF saving for mobile. If sharing fails, the PDF will now automatically download to your device for 100% reliability. | موبائل پر پی ڈی ایف سیو کرنے کے مسئلے کا مستقل حل۔ اگر شیئرنگ کام نہ کرے تو فائل خود بخود ڈاؤن لوڈ ہو جائے گی۔",
   "forced": true
 }
